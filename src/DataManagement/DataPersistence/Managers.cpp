@@ -70,3 +70,23 @@ WaypointList DataPersistence::LoadGlobalWaypoints() {
 
     return waypoints;
 }
+
+//please read the note i wrote for this in the header, thanks :3
+void DataPersistence::SerialiseAndSaveWaypoints(const WaypointList& waypoints) {
+    if (waypoints.size() == 0) return;
+
+    //gonna read the FIRST one to see if its global, hence why that notes so important
+    const auto& firstWaypoint = waypoints[0];
+    const bool isGlobal = firstWaypoint->IsGlobal();
+
+    std::vector<WaypointInformation> waypointInfos {};
+    waypointInfos.reserve(waypoints.size());
+
+    for (const auto& waypoint: waypoints)
+        waypointInfos.push_back(WaypointInformation::FromWaypoint(waypoint));
+
+    Mod::get()->setSavedValue<std::vector<WaypointInformation>>(
+        isGlobal? "global": std::to_string(firstWaypoint->GetLevelID()),
+        waypointInfos
+    );
+}
