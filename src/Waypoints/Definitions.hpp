@@ -5,6 +5,10 @@
 #pragma once
 #include <cstdint>
 
+namespace AutoPauseMod::DataManagement {
+    class DataManager;
+}
+
 namespace AutoPauseMod::Waypoints {
     enum class WaypointBehaviourType: uint8_t {
         FromStartPosOnly, //e.g. a waypoint of 53% and a startpos of 40%: would trigger at 93%
@@ -12,24 +16,27 @@ namespace AutoPauseMod::Waypoints {
         FromAnywhere      //if you pass a specific percentage in a level regardless of startpos
     };
 
+    inline WaypointBehaviourType GetNextWaypointType(const WaypointBehaviourType currentType) {
+        if (currentType == WaypointBehaviourType::FromAnywhere)
+            return WaypointBehaviourType::FromStartPosOnly;
+
+        return static_cast<WaypointBehaviourType>(
+            static_cast<uint8_t>(currentType) + 1
+        );
+    }
+
     class Waypoint final {
         private:
-            uint64_t m_levelID; //TODO: check it's not uint32_t
+            uint32_t m_levelID;
+            float m_activationPercentage;
             WaypointBehaviourType m_behaviourType;
-            float m_activationPercentage; //TODO: check gd actually uses a float or other floating-point thing for this umm can change if not sob
             bool m_bEnabled;
             bool m_bIsGlobal;
 
 
         public:
             explicit Waypoint(WaypointBehaviourType type, float percentage = 0, uint32_t levelID = 0):
-                m_behaviourType(type), m_activationPercentage(percentage), m_bEnabled(true), m_bIsGlobal(false), m_levelID(levelID) {
-                    //if the given level ID is 0 and isGlobal is false, we will quite simply
-                    //just assume the level ID could not be found or else a problem arose
-                    //and just "lock" it as global for safety.
-                    if (levelID == 0 && !this->m_bIsGlobal)
-                        this->m_bIsGlobal = true;
-                };
+                m_behaviourType(type), m_activationPercentage(percentage), m_bEnabled(true), m_bIsGlobal(false), m_levelID(levelID) {};
             ~Waypoint() = default;
             Waypoint(const Waypoint&) = delete;
             Waypoint& operator=(const Waypoint&) = delete;
@@ -37,21 +44,21 @@ namespace AutoPauseMod::Waypoints {
 
 
             void SetBehaviourType(WaypointBehaviourType newType);
-            WaypointBehaviourType GetBehaviourType() const {return this->m_behaviourType;}
+            [[nodiscard]] WaypointBehaviourType GetBehaviourType() const {return this->m_behaviourType;}
 
             void SetLevelID(uint64_t newLevelId);
-            uint64_t GetLevelID() const {return this->m_levelID;}
+            [[nodiscard]] uint64_t GetLevelID() const {return this->m_levelID;}
 
             void SetTriggerPercentage(float newPercentage);
-            uint8_t GetTriggerPercentage() const {return this->m_activationPercentage;}
+            [[nodiscard]] float GetTriggerPercentage() const {return this->m_activationPercentage;}
 
-            bool IsEnabled() const {return this->m_bEnabled;}
             void SetEnabled(bool newEnabled);
+            [[nodiscard]] bool IsEnabled() const {return this->m_bEnabled;}
 
-            bool IsGlobal() const {return this->m_bIsGlobal;}
             void SetGlobal(bool newGlobal);
+            [[nodiscard]] bool IsGlobal() const {return this->m_bIsGlobal;}
 
-            bool ShouldPause(float currentPercentage) const;
+            bool ShouldPause(const DataManagement::DataManager* dataManager, float currentPercentage) const;
             bool operator==(const std::shared_ptr<Waypoint> other) const;
     };
 }
