@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "Definitions.hpp"
 #include "../DataManagement/DataManager.hpp"
+#include "../DataManagement/DataPersistence/Managers.hpp"
 
 using namespace AutoPauseMod::Waypoints;
 using namespace AutoPauseMod::DataManagement;
@@ -28,7 +29,7 @@ void Waypoint::SetBehaviourType(WaypointBehaviourType newType) {
     this->m_behaviourType = newType;
 }
 
-void Waypoint::SetLevelID(uint64_t newLevelId) {
+void Waypoint::SetLevelID(int newLevelId) {
     this->m_levelID = newLevelId;
 }
 
@@ -69,4 +70,30 @@ bool Waypoint::ShouldPause(const DataManager* dataManager, float currentPercenta
     //if the current level being played matches this target level ID *or*
     //it's a global waypoint. Hence, we don't need to check that here.
     return this->m_bEnabled && ValidatePercentage(dataManager, currentPercentage, this->m_activationPercentage, this->m_behaviourType);
+}
+
+std::shared_ptr<Waypoint> Waypoint::FromWaypointInformation(const int levelId, const DataPersistence::WaypointInformation& info) {
+    auto waypoint = std::make_shared<Waypoint>(
+        static_cast<WaypointBehaviourType>(info.behaviourType),
+        info.activationPercentage,
+        0
+    );
+
+    waypoint->SetLevelID(levelId);
+    waypoint->SetEnabled(info.enabled);
+
+    return waypoint;
+}
+
+std::shared_ptr<Waypoint> Waypoint::FromWaypointInformation(const DataPersistence::WaypointInformation& info) {
+    auto waypoint = std::make_shared<Waypoint>(
+        static_cast<WaypointBehaviourType>(info.behaviourType),
+        info.activationPercentage,
+        0
+    );
+
+    waypoint->SetGlobal(true);
+    waypoint->SetEnabled(info.enabled);
+
+    return waypoint;
 }
