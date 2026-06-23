@@ -7,6 +7,10 @@
 
 namespace AutoPauseMod::DataManagement {
     class DataManager;
+
+    namespace DataPersistence {
+        struct WaypointInformation;
+    }
 }
 
 namespace AutoPauseMod::Waypoints {
@@ -27,27 +31,29 @@ namespace AutoPauseMod::Waypoints {
 
     class Waypoint final {
         private:
-            uint32_t m_levelID;
+            int m_levelID;
             float m_activationPercentage;
             WaypointBehaviourType m_behaviourType;
             bool m_bEnabled;
             bool m_bIsGlobal;
 
-
         public:
-            explicit Waypoint(WaypointBehaviourType type, float percentage = 0, uint32_t levelID = 0):
-                m_behaviourType(type), m_activationPercentage(percentage), m_bEnabled(true), m_bIsGlobal(false), m_levelID(levelID) {};
             ~Waypoint() = default;
             Waypoint(const Waypoint&) = delete;
             Waypoint& operator=(const Waypoint&) = delete;
             Waypoint(Waypoint&&) = delete;
 
+            explicit Waypoint(WaypointBehaviourType type, float percentage = 0, uint32_t levelID = 0):
+                   m_behaviourType(type), m_activationPercentage(percentage), m_bEnabled(true), m_bIsGlobal(false), m_levelID(levelID) {};
+
+            static std::shared_ptr<Waypoint> FromWaypointInformation(const int levelId, const DataManagement::DataPersistence::WaypointInformation& info);
+            static std::shared_ptr<Waypoint> FromWaypointInformation(const DataManagement::DataPersistence::WaypointInformation& info);
 
             void SetBehaviourType(WaypointBehaviourType newType);
             [[nodiscard]] WaypointBehaviourType GetBehaviourType() const {return this->m_behaviourType;}
 
-            void SetLevelID(uint64_t newLevelId);
-            [[nodiscard]] uint64_t GetLevelID() const {return this->m_levelID;}
+            void SetLevelID(int newLevelId);
+            [[nodiscard]] int GetLevelID() const {return this->m_levelID;}
 
             void SetTriggerPercentage(float newPercentage);
             [[nodiscard]] float GetTriggerPercentage() const {return this->m_activationPercentage;}
