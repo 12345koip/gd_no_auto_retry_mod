@@ -132,8 +132,17 @@ void DataManager::SetShouldPauseOnNewBest(bool newState) {
     Mod::get()->setSavedValue<bool>("pauseOnNewBest", newState);
 }
 
+void DataManager::SetAttemptStartPercentage(float percentage) {
+    this->m_attemptStartPercent = percentage;
+}
+
+void DataManager::SetShouldIgnorePracticeMode(bool newState) {
+    this->m_bIgnorePracticeMode = newState;
+    Mod::get()->setSavedValue<bool>("ignorePracticeMode", newState);
+}
+
 bool DataManager::CheckWaypoints(const float currentPercentage) const {
-    const auto shouldPause = [&](const std::shared_ptr<Waypoint>& waypoint) -> bool {
+    static const auto shouldPause = [&](const std::shared_ptr<Waypoint>& waypoint) -> bool {
         return waypoint->ShouldPause(this, currentPercentage);
     };
 
@@ -146,4 +155,5 @@ bool DataManager::CheckWaypoints(const float currentPercentage) const {
 DataManager::DataManager() {
     this->m_loadedGlobalWaypoints = DataPersistence::LoadGlobalWaypoints();
     this->m_bPauseOnNewBest = Mod::get()->getSavedValue<bool>("pauseOnNewBest", true);
+    this->m_bIgnorePracticeMode = Mod::get()->getSavedValue<bool>("ignorePracticeMode", true);
 }

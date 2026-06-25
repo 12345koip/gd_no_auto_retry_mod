@@ -20,6 +20,7 @@ namespace AutoPauseMod::DataManagement {
             int m_currentLevelID = 0;
 
             bool m_bPauseOnNewBest = true;
+            bool m_bIgnorePracticeMode = true;
 
             //this will be set true for any level type that is not supported,
             //such as an editor playtest or platformer mode. Just means we'll
@@ -48,6 +49,9 @@ namespace AutoPauseMod::DataManagement {
             [[nodiscard]] bool GetShouldPauseOnNewBest() const {return this->m_bPauseOnNewBest;}
             void SetShouldPauseOnNewBest(bool newState);
 
+            [[nodiscard]] bool GetIgnorePracticeMode() const {return this->m_bIgnorePracticeMode;}
+            void SetShouldIgnorePracticeMode(bool newState);
+
             //performs a check on death to see if any waypoints cause for a pause
             bool CheckWaypoints(const float currentPercentage) const;
 
@@ -57,5 +61,6 @@ namespace AutoPauseMod::DataManagement {
 
             void UpdateLevelInformation();
             [[nodiscard]] float GetAttemptStartPercentage() const {return this->m_attemptStartPercent;}
+            void SetAttemptStartPercentage(float percentage);
     };
 }
