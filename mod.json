@@ -6,8 +6,8 @@
 		"mac": "2.2081",
 		"ios": "2.2081"
 	},
-	"id": "kxtie_gd.no-auto-retry-at-percentage",
-	"name": "No Auto Retry At %",
+	"id": "kxtie_gd.auto-pause-on-death",
+	"name": "Auto Pause On Death",
 	"version": "v1.0.0",
 	"developer": "kxtie_gd",
 	"description": "",

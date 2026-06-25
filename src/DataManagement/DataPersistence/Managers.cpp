@@ -11,7 +11,7 @@ using namespace AutoPauseMod::DataManagement::DataPersistence;
 using namespace AutoPauseMod::DataManagement;
 using namespace geode::prelude;
 
-WaypointInformation WaypointInformation::FromWaypoint(const std::shared_ptr<Waypoints::Waypoint> waypoint) {
+WaypointInformation WaypointInformation::FromWaypoint(const std::shared_ptr<Waypoints::Waypoint>& waypoint) {
     return WaypointInformation {
         waypoint->GetTriggerPercentage(),
         static_cast<uint8_t>(waypoint->GetBehaviourType()),
@@ -73,7 +73,7 @@ WaypointList DataPersistence::LoadGlobalWaypoints() {
 
 //please read the note i wrote for this in the header, thanks :3
 void DataPersistence::SerialiseAndSaveWaypoints(const WaypointList& waypoints) {
-    if (waypoints.size() == 0) return;
+    if (waypoints.empty()) return;
 
     //gonna read the FIRST one to see if its global, hence why that notes so important
     const auto& firstWaypoint = waypoints[0];

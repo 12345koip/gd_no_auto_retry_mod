@@ -28,10 +28,10 @@ namespace AutoPauseMod::DataManagement::DataPersistence {
         //global waypoints will be stored under the key "global" and loaded at startup.
         //level ID waypoints are stored under an array with their associated level ID.
 
-        static WaypointInformation FromWaypoint(const std::shared_ptr<Waypoints::Waypoint> waypoint);
+        static WaypointInformation FromWaypoint(const std::shared_ptr<Waypoints::Waypoint>& waypoint);
     };
 
-    //NOTE: *FOR THE SAKE of performance*
+    //NOTE: *FOR THE SAKE of performance and memory and all that lovely stuff*
     //this function EXPECTS that the WaypointList passed
     //contains waypoints *ENTIRELY* specific to a level, or *ENTIRELY* global
     //DataManager SHOULD HANDLE moving them between the two lists appropriately

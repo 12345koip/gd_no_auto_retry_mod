@@ -37,6 +37,10 @@ namespace AutoPauseMod::Waypoints {
             bool m_bEnabled;
             bool m_bIsGlobal;
 
+            void SetGlobal(bool newGlobal);
+
+            friend class DataManagement::DataManager;
+
         public:
             ~Waypoint() = default;
             Waypoint(const Waypoint&) = delete;
@@ -61,10 +65,9 @@ namespace AutoPauseMod::Waypoints {
             void SetEnabled(bool newEnabled);
             [[nodiscard]] bool IsEnabled() const {return this->m_bEnabled;}
 
-            void SetGlobal(bool newGlobal);
             [[nodiscard]] bool IsGlobal() const {return this->m_bIsGlobal;}
 
-            bool ShouldPause(const DataManagement::DataManager* dataManager, float currentPercentage) const;
-            bool operator==(const std::shared_ptr<Waypoint> other) const;
+            bool ShouldPause(const DataManagement::DataManager* dataManager, const float currentPercentage) const;
+            bool operator==(const std::shared_ptr<Waypoint>& other) const;
     };
 }
