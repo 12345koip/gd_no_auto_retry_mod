@@ -20,9 +20,6 @@ void Waypoint::SetEnabled(bool newEnabled) {
 
 void Waypoint::SetGlobal(bool newGlobal) {
     this->m_bIsGlobal = newGlobal;
-
-    if (newGlobal)
-        this->m_levelID = 0; //if it was a mistake, the user can click the button again and it'll grab the level ID
 }
 
 void Waypoint::SetBehaviourType(WaypointBehaviourType newType) {
@@ -33,7 +30,7 @@ void Waypoint::SetLevelID(int newLevelId) {
     this->m_levelID = newLevelId;
 }
 
-bool Waypoint::operator==(const std::shared_ptr<Waypoint> other) const {
+bool Waypoint::operator==(const std::shared_ptr<Waypoint>& other) const {
     return (
         this->m_levelID == other->GetLevelID() &&
         this->m_bIsGlobal == other->IsGlobal() &&
@@ -65,7 +62,7 @@ static bool ValidatePercentage(const DataManager* dataManager, const float curre
     }
 }
 
-bool Waypoint::ShouldPause(const DataManager* dataManager, float currentPercentage) const {
+bool Waypoint::ShouldPause(const DataManager* dataManager, const float currentPercentage) const {
     //The waypoint will only be loaded (and hence this function called)
     //if the current level being played matches this target level ID *or*
     //it's a global waypoint. Hence, we don't need to check that here.
