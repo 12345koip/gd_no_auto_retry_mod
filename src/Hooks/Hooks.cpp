@@ -27,7 +27,7 @@ class $modify(PlayLayer) {
         auto* playLayer = PlayLayer::get();
         const auto& DataManager = DataManager::GetSingleton();
 
-        if (DataManager.GetIgnoreState() || playLayer->m_isPracticeMode && DataManager.GetIgnorePracticeMode())
+        if (DataManager.GetIgnoreState() || (playLayer->m_isPracticeMode && DataManager.GetIgnorePracticeMode()))
             return playLayer->destroyPlayer(player, object);
 
         const int currentBest = playLayer->m_level->getNormalPercent();
@@ -46,9 +46,32 @@ class $modify(PlayLayer) {
     }
 };
 
-class $modify(PauseLayer) {
+class $modify(ModifiedPauseLayer, PauseLayer) {
     void customSetup() override {
         PauseLayer::customSetup();
 
+        CCNode* menu = this->getChildByID("bottom-button-menu");
+        if (!menu) return;
+
+        auto button = CCMenuItemSpriteExtra::create(
+            ButtonSprite::create("AutoPause"),
+            this,
+            menu_selector(ModifiedPauseLayer::onUIOpenButtonClicked)
+        );
+
+        button->setLayoutOptions(
+            AxisLayoutOptions::create()
+                ->setAutoScale(false)
+        );
+
+        button->m_baseScale = 0.7f;
+        button->setScale(0.7f);
+
+        menu->addChild(button);
+        menu->updateLayout();
+    }
+
+    void onUIOpenButtonClicked(CCObject*) {
+        log::debug("click");
     }
 };
