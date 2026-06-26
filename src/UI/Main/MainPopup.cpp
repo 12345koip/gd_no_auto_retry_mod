@@ -89,14 +89,18 @@ void MainMenuPopup::onNewBestToggleClicked(CCObject* sender) {
     auto toggle = typeinfo_cast<CCMenuItemToggler*>(sender);
     if (!toggle) return;
 
-    bool enabled = toggle->isToggled();
-    DataManager::GetSingleton().SetShouldPauseOnNewBest(enabled);
+    bool disabled = toggle->isToggled();
+    DataManager::GetSingleton().SetShouldPauseOnNewBest(!disabled);
 }
 
 void MainMenuPopup::onPracticeToggleClicked(CCObject* sender) {
     auto toggle = typeinfo_cast<CCMenuItemToggler*>(sender);
     if (!toggle) return;
 
-    bool enabled = toggle->isToggled();
-    DataManager::GetSingleton().SetShouldIgnorePracticeMode(enabled);
+    bool disabled = toggle->isToggled();
+    if (disabled)
+        log::debug("toggled on");
+    else
+        log::debug("toggled off");
+    DataManager::GetSingleton().SetShouldIgnorePracticeMode(!disabled);
 }
