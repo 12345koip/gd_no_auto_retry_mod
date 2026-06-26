@@ -6,6 +6,7 @@
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/PauseLayer.hpp>
 #include "../DataManagement/DataManager.hpp"
+#include "../UI/Main/MainPopup.hpp"
 
 using namespace AutoPauseMod::DataManagement;
 using namespace geode::prelude;
@@ -72,6 +73,7 @@ class $modify(ModifiedPauseLayer, PauseLayer) {
     }
 
     void onUIOpenButtonClicked(CCObject*) {
-        log::debug("click");
+        auto popup = AutoPauseMod::UI::Main::MainMenuPopup::create();
+        if (popup) popup->show();
     }
 };
