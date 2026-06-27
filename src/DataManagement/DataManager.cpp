@@ -5,6 +5,7 @@
 #include <Geode/Geode.hpp>
 #include <cvolton.level-id-api/include/EditorIDs.hpp>
 #include "DataManager.hpp"
+#include "../UI/Main/MainPopup.hpp"
 
 using namespace AutoPauseMod::DataManagement;
 using namespace AutoPauseMod::Waypoints;
@@ -136,6 +137,15 @@ void DataManager::SetAttemptStartPercentage(float percentage) {
     this->m_attemptStartPercent = percentage;
 }
 
+void DataManager::DiscardPopup() {
+    this->m_menuPopup = nullptr;
+}
+
+void DataManager::ShowMenuPopup() {
+    if (this->m_menuPopup)
+        this->m_menuPopup->show();
+}
+
 void DataManager::SetShouldIgnorePracticeMode(bool newState) {
     this->m_bIgnorePracticeMode = newState;
     Mod::get()->setSavedValue<bool>("ignorePracticeMode", newState);
@@ -148,6 +158,11 @@ bool DataManager::CheckWaypoints(const float currentPercentage) const {
 
     return std::ranges::any_of(this->m_loadedGlobalWaypoints, shouldPause) ||
         std::ranges::any_of(this->m_loadedLevelWaypoints, shouldPause);
+}
+
+void DataManager::UpdateMenuPopupPointer(UI::Main::MainMenuPopup* newPointer) {
+    if (!this->m_menuPopup)
+        this->m_menuPopup = newPointer;
 }
 
 //gonna do some textbook RAII bc uhh its cool :3

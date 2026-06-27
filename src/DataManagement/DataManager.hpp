@@ -16,6 +16,12 @@ namespace AutoPauseMod::UI::Main {
 namespace AutoPauseMod::DataManagement {
     class DataManager final {
         private:
+
+            //this is just an observer pointer bc the user
+            //might open it multiple times on one pause
+            //and idk the adding of nodes each time might be expensive
+            UI::Main::MainMenuPopup* m_menuPopup = nullptr;
+
             //NOTE: these two waypoint lists should always be in a sorted state
             DataPersistence::WaypointList m_loadedLevelWaypoints {};
             DataPersistence::WaypointList m_loadedGlobalWaypoints {};
@@ -37,6 +43,7 @@ namespace AutoPauseMod::DataManagement {
             void RefreshWaypoints(); //will be called after a new level is entered.
             void SetShouldIgnorePracticeMode(bool newState);
             void SetShouldPauseOnNewBest(bool newState);
+            void DiscardPopup();
 
 
             DataManager();
@@ -68,5 +75,10 @@ namespace AutoPauseMod::DataManagement {
             void UpdateLevelInformation();
             [[nodiscard]] float GetAttemptStartPercentage() const {return this->m_attemptStartPercent;}
             void SetAttemptStartPercentage(float percentage);
+
+            void ShowMenuPopup();
+
+            void UpdateMenuPopupPointer(UI::Main::MainMenuPopup* newPointer);
+            [[nodiscard]] UI::Main::MainMenuPopup* GetMenuPopup() const {return this->m_menuPopup;}
     };
 }

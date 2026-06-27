@@ -90,6 +90,7 @@ bool MainMenuPopup::init() {
     scroller->m_contentLayer->setLayout(
         ScrollLayer::createDefaultListLayout(6.0f)
     );
+    scroller->setID("auto-pause-on-death:element_scroller");
 
     this->m_mainLayer->addChildAtPosition(scroller, Anchor::Center, {0.0f, -35.0f});
 
@@ -150,4 +151,8 @@ void MainMenuPopup::onPracticeToggleClicked(CCObject* sender) {
 
 void MainMenuPopup::onNewWaypointButtonClicked(CCObject*) {
     log::debug("clicked");
+}
+
+MainMenuPopup::~MainMenuPopup() {
+    DataManager::GetSingleton()->DiscardPopup();
 }
