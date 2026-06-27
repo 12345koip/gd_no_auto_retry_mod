@@ -9,6 +9,10 @@
 #include "../Waypoints/Definitions.hpp"
 #include "DataPersistence/Managers.hpp"
 
+namespace AutoPauseMod::UI::Main {
+    class MainMenuPopup;
+}
+
 namespace AutoPauseMod::DataManagement {
     class DataManager final {
         private:
@@ -31,14 +35,19 @@ namespace AutoPauseMod::DataManagement {
 
 
             void RefreshWaypoints(); //will be called after a new level is entered.
+            void SetShouldIgnorePracticeMode(bool newState);
+            void SetShouldPauseOnNewBest(bool newState);
+
 
             DataManager();
             ~DataManager() = default;
 
+            friend class AutoPauseMod::UI::Main::MainMenuPopup;
+
         public:
-            static DataManager& GetSingleton() {
+            static DataManager* GetSingleton() {
                 static DataManager dataManager;
-                return dataManager;
+                return &dataManager;
             }
 
             [[nodiscard]] bool GetIgnoreState() const {return this->m_bIgnoreState;}
@@ -47,10 +56,7 @@ namespace AutoPauseMod::DataManagement {
             void DeleteWaypoint(const std::shared_ptr<Waypoints::Waypoint>& waypoint);
 
             [[nodiscard]] bool GetShouldPauseOnNewBest() const {return this->m_bPauseOnNewBest;}
-            void SetShouldPauseOnNewBest(bool newState);
-
             [[nodiscard]] bool GetIgnorePracticeMode() const {return this->m_bIgnorePracticeMode;}
-            void SetShouldIgnorePracticeMode(bool newState);
 
             //performs a check on death to see if any waypoints cause for a pause
             bool CheckWaypoints(const float currentPercentage) const;

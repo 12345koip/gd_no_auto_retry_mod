@@ -28,5 +28,6 @@ namespace AutoPauseMod::UI::Main {
 
         void onPracticeToggleClicked(CCObject* sender);
         void onNewBestToggleClicked(CCObject* sender);
+        void onNewWaypointButtonClicked(CCObject*);
     };
 }
