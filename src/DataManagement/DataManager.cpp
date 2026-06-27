@@ -142,7 +142,7 @@ void DataManager::SetShouldIgnorePracticeMode(bool newState) {
 }
 
 bool DataManager::CheckWaypoints(const float currentPercentage) const {
-    static const auto shouldPause = [&](const std::shared_ptr<Waypoint>& waypoint) -> bool {
+    const auto shouldPause = [&](const std::shared_ptr<Waypoint>& waypoint) -> bool {
         return waypoint->ShouldPause(this, currentPercentage);
     };
 

@@ -34,7 +34,7 @@ bool MainMenuPopup::init() {
     this->setTitle("AutoPause On Death Configuration");
 
 
-    auto& DataManager = DataManager::GetSingleton();
+    auto* DataManager = DataManager::GetSingleton();
 
     //--- toggles creation ---//
     auto menu = CCMenu::create();
@@ -46,7 +46,7 @@ bool MainMenuPopup::init() {
         menu_selector(MainMenuPopup::onPracticeToggleClicked),
         0.8f,
         {190.f, 195.f},
-        DataManager.GetIgnorePracticeMode()
+        DataManager->GetIgnorePracticeMode()
     );
     menu->addChild(toggle_practiceMode);
 
@@ -65,7 +65,7 @@ bool MainMenuPopup::init() {
         menu_selector(MainMenuPopup::onNewBestToggleClicked),
         0.8f,
         {375.0f, 195.0f},
-        DataManager.GetShouldPauseOnNewBest()
+        DataManager->GetShouldPauseOnNewBest()
     );
     menu->addChild(toggle_pauseOnNewBest);
 
@@ -79,6 +79,53 @@ bool MainMenuPopup::init() {
     this->m_mainLayer->addChild(label_pauseOnNewBest);
 
 
+    //--- scroller with waypoint toggles setup ---//
+    auto scroller = ScrollLayer::create(
+        {280.0f, 125.0f},
+        true,
+        true
+    );
+
+    scroller->m_bIgnoreAnchorPointForPosition = false;
+    scroller->m_contentLayer->setLayout(
+        ScrollLayer::createDefaultListLayout(6.0f)
+    );
+
+    this->m_mainLayer->addChildAtPosition(scroller, Anchor::Center, {0.0f, -35.0f});
+
+    auto bg = CCLayerColor::create({0, 0, 0, 90});
+    bg->setContentSize({280.0f, 125.0f});
+    bg->m_bIgnoreAnchorPointForPosition = false;
+
+    this->m_mainLayer->addChildAtPosition(bg, Anchor::Center, {0.0f, -35.0f});
+
+
+
+    auto label_waypoints = makeLabel(
+        "Waypoints",
+        "bigFont.fnt",
+        {0.5f, 0.5f},
+        {200.0f, 167.0f},
+        0.6f
+    );
+
+    this->m_mainLayer->addChild(label_waypoints);
+
+
+
+    auto button_new = CCMenuItemSpriteExtra::create(
+        ButtonSprite::create("New"),
+        this,
+        menu_selector(MainMenuPopup::onNewWaypointButtonClicked)
+    );
+
+    button_new->setLayoutOptions(AxisLayoutOptions::create()->setAutoScale(false));
+    button_new->m_baseScale = 0.7f;
+    button_new->setScale(0.7f);
+    button_new->setPosition({317.0f, 166.0f});
+    menu->addChild(button_new);
+
+
     return true;
 }
 
@@ -90,7 +137,7 @@ void MainMenuPopup::onNewBestToggleClicked(CCObject* sender) {
     if (!toggle) return;
 
     bool disabled = toggle->isToggled();
-    DataManager::GetSingleton().SetShouldPauseOnNewBest(!disabled);
+    DataManager::GetSingleton()->SetShouldPauseOnNewBest(!disabled);
 }
 
 void MainMenuPopup::onPracticeToggleClicked(CCObject* sender) {
@@ -98,9 +145,9 @@ void MainMenuPopup::onPracticeToggleClicked(CCObject* sender) {
     if (!toggle) return;
 
     bool disabled = toggle->isToggled();
-    if (disabled)
-        log::debug("toggled on");
-    else
-        log::debug("toggled off");
-    DataManager::GetSingleton().SetShouldIgnorePracticeMode(!disabled);
+    DataManager::GetSingleton()->SetShouldIgnorePracticeMode(!disabled);
+}
+
+void MainMenuPopup::onNewWaypointButtonClicked(CCObject*) {
+    log::debug("clicked");
 }

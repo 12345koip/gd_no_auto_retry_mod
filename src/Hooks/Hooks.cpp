@@ -14,11 +14,11 @@ using namespace geode::prelude;
 class $modify(PlayLayer) {
     void resetLevel() override {
         PlayLayer* PlayLayer = PlayLayer::get();
-        auto& DataManager = DataManager::GetSingleton();
+        auto* DataManager = DataManager::GetSingleton();
 
         float currentPercent = PlayLayer->getCurrentPercent();
 
-        DataManager.SetAttemptStartPercentage(currentPercent);
+        DataManager->SetAttemptStartPercentage(currentPercent);
         PlayLayer->resetLevel();
     }
 
@@ -26,9 +26,9 @@ class $modify(PlayLayer) {
 
     void destroyPlayer(PlayerObject* player, GameObject* object) override {
         auto* playLayer = PlayLayer::get();
-        const auto& DataManager = DataManager::GetSingleton();
+        const auto* DataManager = DataManager::GetSingleton();
 
-        if (DataManager.GetIgnoreState() || (playLayer->m_isPracticeMode && DataManager.GetIgnorePracticeMode()))
+        if (DataManager->GetIgnoreState() || (playLayer->m_isPracticeMode && DataManager->GetIgnorePracticeMode()))
             return playLayer->destroyPlayer(player, object);
 
         const int currentBest = playLayer->m_level->getNormalPercent();
@@ -42,7 +42,7 @@ class $modify(PlayLayer) {
          * new best AND "pause on new best" setting is enabled,
          * OR any enabled waypoint signals a pause
          */
-        if ((isNewBest && DataManager.GetShouldPauseOnNewBest()) || DataManager.CheckWaypoints(currentPercentage))
+        if ((isNewBest && DataManager->GetShouldPauseOnNewBest()) || DataManager->CheckWaypoints(currentPercentage))
             playLayer->pauseGame(false);
     }
 };
