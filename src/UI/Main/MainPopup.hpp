@@ -11,7 +11,7 @@ namespace AutoPauseMod::UI::Main {
 
     class MainMenuPopup: public geode::Popup {
         protected:
-            bool init();
+            bool init() override;
 
         public:
             static MainMenuPopup* create() {
@@ -29,5 +29,7 @@ namespace AutoPauseMod::UI::Main {
         void onPracticeToggleClicked(CCObject* sender);
         void onNewBestToggleClicked(CCObject* sender);
         void onNewWaypointButtonClicked(CCObject*);
+
+        ~MainMenuPopup() override;
     };
 }
