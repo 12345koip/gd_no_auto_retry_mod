@@ -13,29 +13,30 @@ using namespace geode::prelude;
 
 class $modify(PlayLayer) {
     void resetLevel() override {
-        PlayLayer* PlayLayer = PlayLayer::get();
         auto* DataManager = DataManager::GetSingleton();
 
-        float currentPercent = PlayLayer->getCurrentPercent();
+        float currentPercent = PlayLayer::getCurrentPercent();
 
         DataManager->SetAttemptStartPercentage(currentPercent);
-        PlayLayer->resetLevel();
+        PlayLayer::resetLevel();
     }
 
 
 
     void destroyPlayer(PlayerObject* player, GameObject* object) override {
-        auto* playLayer = PlayLayer::get();
         const auto* DataManager = DataManager::GetSingleton();
 
-        if (DataManager->GetIgnoreState() || (playLayer->m_isPracticeMode && DataManager->GetIgnorePracticeMode()))
-            return playLayer->destroyPlayer(player, object);
+        if (object == this->m_anticheatSpike)
+            return PlayLayer::destroyPlayer(player, object);
 
-        const int currentBest = playLayer->m_level->getNormalPercent();
-        const float currentPercentage = playLayer->getCurrentPercent();
-        playLayer->destroyPlayer(player, object);
+        if (DataManager->GetIgnoreState() || (this->m_isPracticeMode && DataManager->GetIgnorePracticeMode()))
+            return PlayLayer::destroyPlayer(player, object);
 
-        const bool isNewBest = (currentPercentage > currentBest) && !playLayer->m_isPracticeMode;
+        const int currentBest = this->m_level->getNormalPercent();
+        const float currentPercentage = this->getCurrentPercent();
+        this->destroyPlayer(player, object);
+
+        const bool isNewBest = (currentPercentage > currentBest) && !this->m_isPracticeMode;
 
         /*
          * pause on either:
@@ -43,7 +44,7 @@ class $modify(PlayLayer) {
          * OR any enabled waypoint signals a pause
          */
         if ((isNewBest && DataManager->GetShouldPauseOnNewBest()) || DataManager->CheckWaypoints(currentPercentage))
-            playLayer->pauseGame(false);
+            PlayLayer::pauseGame(false);
     }
 };
 
