@@ -141,7 +141,7 @@ void DataManager::DiscardPopup() {
     this->m_menuPopup = nullptr;
 }
 
-void DataManager::ShowMenuPopup() {
+void DataManager::ShowMenuPopup() const {
     if (this->m_menuPopup)
         this->m_menuPopup->show();
 }

@@ -86,11 +86,13 @@ bool MainMenuPopup::init() {
         true
     );
 
+
     scroller->m_bIgnoreAnchorPointForPosition = false;
     scroller->m_contentLayer->setLayout(
         ScrollLayer::createDefaultListLayout(6.0f)
     );
-    scroller->setID("auto-pause-on-death:element_scroller");
+
+    scroller->setID("element_scroller"_spr);
 
     this->m_mainLayer->addChildAtPosition(scroller, Anchor::Center, {0.0f, -35.0f});
 
@@ -99,8 +101,6 @@ bool MainMenuPopup::init() {
     bg->m_bIgnoreAnchorPointForPosition = false;
 
     this->m_mainLayer->addChildAtPosition(bg, Anchor::Center, {0.0f, -35.0f});
-
-
 
     auto label_waypoints = makeLabel(
         "Waypoints",
@@ -130,7 +130,72 @@ bool MainMenuPopup::init() {
     return true;
 }
 
+CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoint>& waypoint) {
+    auto row = CCNode::create();
+    row->setContentSize({270.0f, 34.0f});
 
+    row->setLayoutOptions(
+        AxisLayoutOptions::create()->setLength(34.0f)
+    );
+
+    auto bg = CCLayerColor::create({255, 255, 255, 20});
+    bg->setContentSize(row->getContentSize());
+    bg->m_bIgnoreAnchorPointForPosition = false;
+    bg->setAnchorPoint({0.5f, 0.5f});
+    bg->setPosition(row->getContentSize() / 2);
+    row->addChild(bg);
+
+
+    //"global" label.
+    auto label_global = makeLabel(
+        "Global",
+        "bigFont.fnt",
+        {0.0f, 0.5f},
+        {8.0f, 17.0f},
+        0.5f
+    );
+    label_global->setVisible(false); //TODO: remove this when done debugging sob
+
+    row->addChild(label_global);
+
+    //toggle for global
+    auto toggle = makeToggle(
+        this,
+        menu_selector(MainMenuPopup::onRowGlobalToggleClicked),
+        0.65f,
+        {82.0f, 17.0f},
+        waypoint->IsGlobal()
+    );
+
+    //toggler menu
+    auto toggleMenu = CCMenu::create();
+    toggleMenu->setPosition({135.0f, 0.0f});
+    toggleMenu->addChild(toggle);
+    row->addChild(toggleMenu);
+
+    //percentage trigger input
+    auto input = TextInput::create(55.0f, "100");
+    input->setPosition({30.0f, 17.0f});
+    input->setScale(0.7f);
+    input->setAnchorPoint({0.5f, 0.5f});
+    row->addChild(input);
+
+    //percentage sign
+    auto label_percentage = makeLabel(
+        "%",
+        "bigFont.fnt",
+        {0.0f, 0.5f},
+        {55.0f, 17.0f},
+        0.5f
+    );
+    row->addChild(label_percentage);
+
+    return row;
+}
+
+MainMenuPopup::~MainMenuPopup() {
+    DataManager::GetSingleton()->DiscardPopup();
+}
 
 //listeners.
 void MainMenuPopup::onNewBestToggleClicked(CCObject* sender) {
@@ -150,9 +215,22 @@ void MainMenuPopup::onPracticeToggleClicked(CCObject* sender) {
 }
 
 void MainMenuPopup::onNewWaypointButtonClicked(CCObject*) {
-    log::debug("clicked");
+    auto test_wp = std::make_shared<Waypoints::Waypoint>(
+        Waypoints::WaypointBehaviourType::FromAnywhere,
+        0.0f,
+        0.0f
+    );
+
+    CCNode* row = MainMenuPopup::makeUIForWaypoint(test_wp);
+    auto scroller = static_cast<geode::ScrollLayer*>(
+        this->m_mainLayer->getChildByID("element_scroller"_spr)
+    );
+
+    scroller->m_contentLayer->addChild(row);
+    scroller->m_contentLayer->updateLayout();
+    scroller->scrollToTop();
 }
 
-MainMenuPopup::~MainMenuPopup() {
-    DataManager::GetSingleton()->DiscardPopup();
+void MainMenuPopup::onRowGlobalToggleClicked(CCObject* sender) {
+    log::debug("click");
 }

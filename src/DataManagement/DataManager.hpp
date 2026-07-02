@@ -76,9 +76,12 @@ namespace AutoPauseMod::DataManagement {
             [[nodiscard]] float GetAttemptStartPercentage() const {return this->m_attemptStartPercent;}
             void SetAttemptStartPercentage(float percentage);
 
-            void ShowMenuPopup();
+            void ShowMenuPopup() const;
 
             void UpdateMenuPopupPointer(UI::Main::MainMenuPopup* newPointer);
             [[nodiscard]] UI::Main::MainMenuPopup* GetMenuPopup() const {return this->m_menuPopup;}
+
+            [[nodiscard]] DataPersistence::WaypointList GetLevelWaypoints() const {return this->m_loadedLevelWaypoints;}
+            [[nodiscard]] DataPersistence::WaypointList GetGlobalWaypoints() const {return this->m_loadedGlobalWaypoints;}
     };
 }
