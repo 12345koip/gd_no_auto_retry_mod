@@ -5,6 +5,7 @@
 #include <Geode/Geode.hpp>
 #include "MainPopup.hpp"
 #include "../../DataManagement/DataManager.hpp"
+#include "../Selectors/ThreeWaySelector.hpp"
 
 using namespace AutoPauseMod::UI::Main;
 using namespace AutoPauseMod::DataManagement;
@@ -156,7 +157,6 @@ bool MainMenuPopup::init() {
     button_disableAll->setPosition(33.0f, 82.0f);
     menu->addChild(button_disableAll);
 
-
     return true;
 }
 
@@ -258,6 +258,22 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
     toggleMenu->addChild(button_deleteWaypoint);
 
 
+    //waypoint type toggle + label
+    auto label_from = makeLabel(
+        "From",
+        "bigFont.fnt",
+        {0.5f, 0.5f},
+        {222.0f, 28.0f},
+        0.3f
+    );
+    row->addChild(label_from);
+
+
+    //selector.
+    auto selector = Selectors::ThreeWaySelector::create();
+    selector->setPosition({222.0f, 13.0f});
+    selector->setScale(0.5f);
+    row->addChild(selector);
 
 
     //TODO: figure out how lambda captures and referencing
