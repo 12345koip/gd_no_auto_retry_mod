@@ -42,7 +42,7 @@ namespace AutoPauseMod::Waypoints {
             friend class DataManagement::DataManager;
 
         public:
-            ~Waypoint() = default;
+            ~Waypoint();
             Waypoint(const Waypoint&) = delete;
             Waypoint& operator=(const Waypoint&) = delete;
             Waypoint(Waypoint&&) = delete;

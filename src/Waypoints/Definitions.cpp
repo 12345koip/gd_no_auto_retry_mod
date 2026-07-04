@@ -6,6 +6,7 @@
 #include "Definitions.hpp"
 #include "../DataManagement/DataManager.hpp"
 #include "../DataManagement/DataPersistence/Managers.hpp"
+#include "../UI/Main/MainPopup.hpp"
 
 using namespace AutoPauseMod::Waypoints;
 using namespace AutoPauseMod::DataManagement;
@@ -55,7 +56,7 @@ static bool ValidatePercentage(const DataManager* dataManager, const float curre
             return currentPercentage - startPos >= activationPercentage;
 
         case WaypointBehaviourType::FromStartOnly:
-            return startPos <= 0.0f && currentPercentage >= activationPercentage;
+            return startPos <= 0.01f && currentPercentage >= activationPercentage;
 
         default:
             return false;
@@ -93,4 +94,9 @@ std::shared_ptr<Waypoint> Waypoint::FromWaypointInformation(const DataPersistenc
     waypoint->SetEnabled(info.enabled);
 
     return waypoint;
+}
+
+Waypoint::~Waypoint() {
+    if (auto* popup = DataManager::GetSingleton()->GetMenuPopup())
+        popup->DiscardUIForWaypoint(this);
 }
