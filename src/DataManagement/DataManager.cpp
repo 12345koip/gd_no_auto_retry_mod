@@ -55,10 +55,7 @@ std::shared_ptr<Waypoint> DataManager::NewWaypoint() {
         this->m_loadedLevelWaypoints,
         waypoint->GetTriggerPercentage(),
         std::ranges::less{},
-
-        [](const std::shared_ptr<Waypoint>& other) -> float {
-            return other->GetTriggerPercentage();
-        }
+        &Waypoint::GetTriggerPercentage
     );
 
     this->m_loadedLevelWaypoints.insert(pos, waypoint);
@@ -78,10 +75,7 @@ void DataManager::ToggleWaypoint(const std::shared_ptr<Waypoint>& waypoint) {
             this->m_loadedGlobalWaypoints,
             waypoint->GetTriggerPercentage(),
             std::ranges::less{},
-
-            [](const std::shared_ptr<Waypoint>& other) -> float {
-                return other->GetTriggerPercentage();
-            }
+            &Waypoint::GetTriggerPercentage
         );
 
         this->m_loadedGlobalWaypoints.insert(pos, waypoint);
@@ -103,10 +97,7 @@ void DataManager::ToggleWaypoint(const std::shared_ptr<Waypoint>& waypoint) {
             this->m_loadedLevelWaypoints,
             waypoint->GetTriggerPercentage(),
             std::ranges::less{},
-
-            [](const std::shared_ptr<Waypoint>& other) -> float {
-                return other->GetTriggerPercentage();
-            }
+            &Waypoint::GetTriggerPercentage
         );
 
         this->m_loadedLevelWaypoints.insert(pos, waypoint);
@@ -146,6 +137,11 @@ void DataManager::ShowMenuPopup() const {
         this->m_menuPopup->show();
 }
 
+void DataManager::DeleteAllWaypoints() {
+    this->m_loadedGlobalWaypoints.clear();
+    this->m_loadedLevelWaypoints.clear();
+}
+
 void DataManager::SetShouldIgnorePracticeMode(bool newState) {
     this->m_bIgnorePracticeMode = newState;
     Mod::get()->setSavedValue<bool>("ignorePracticeMode", newState);
@@ -163,6 +159,21 @@ bool DataManager::CheckWaypoints(const float currentPercentage) const {
 void DataManager::UpdateMenuPopupPointer(UI::Main::MainMenuPopup* newPointer) {
     if (!this->m_menuPopup)
         this->m_menuPopup = newPointer;
+}
+
+void DataManager::UpdateWaypointListPosition(const std::shared_ptr<Waypoints::Waypoint>& waypoint) {
+    auto& waypoints = waypoint->IsGlobal()? this->m_loadedGlobalWaypoints: this->m_loadedLevelWaypoints;
+
+    std::erase(waypoints, waypoint);
+
+    auto pos = std::ranges::lower_bound(
+    this->m_loadedGlobalWaypoints,
+    waypoint->GetTriggerPercentage(),
+    {},
+    &Waypoint::GetTriggerPercentage
+    );
+
+    waypoints.insert(pos, waypoint);
 }
 
 //gonna do some textbook RAII bc uhh its cool :3

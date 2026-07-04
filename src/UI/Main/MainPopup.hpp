@@ -7,6 +7,7 @@
 #include <Geode/Geode.hpp>
 #include <Geode/ui/Popup.hpp>
 #include <unordered_map>
+#include <optional>
 
 namespace AutoPauseMod::Waypoints {
     class Waypoint;
@@ -18,19 +19,11 @@ namespace AutoPauseMod::UI::Main {
         protected:
             bool init() override;
 
-            //std::weak_ptr won't play nice with std::hash, but this instance
-            //as a whole won't persist past exiting the current level.
-            //the main thing we wanted to avoid was holding a reference,
-            //but a raw pointer really should not be a problem anyway.
-            std::unordered_map<const Waypoints::Waypoint*, CCNode*> m_waypointUIMap {};
+            std::unordered_map<CCNode*, std::weak_ptr<Waypoints::Waypoint>> m_waypointUIMap {};
 
             //TODO: add hooks to listen for exiting a level, and have the UI discarded then.
 
             [[nodiscard]] CCNode* makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoint>& waypoint);
-
-            friend class Waypoints::Waypoint;
-
-            void DiscardUIForWaypoint(const Waypoints::Waypoint* waypoint);
 
         public:
             static MainMenuPopup* create() {
@@ -53,6 +46,10 @@ namespace AutoPauseMod::UI::Main {
             void onRowEnabledToggleClicked(CCObject* sender);
             void onDeleteAllWaypointsButtonClicked(CCObject*);
             void onDisableAllWaypointsButtonClicked(CCObject*);
+
+            CCNode* GetWaypointUI(const Waypoints::Waypoint* waypoint) const;
+            std::optional<std::weak_ptr<Waypoints::Waypoint>> GetAssociatedWaypoint(CCNode* ui) const;
+            CCNode* ResolveWaypointUIRoot(CCNode* current);
 
             ~MainMenuPopup() override;
     };

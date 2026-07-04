@@ -2,7 +2,7 @@
 // Created by katie on 04/07/2026.
 //
 
-#include "ThreeWaySelector.hpp"
+#include "WaypointBehaviourSelector.hpp"
 #include <Geode/Geode.hpp>
 #include <algorithm>
 
@@ -66,6 +66,6 @@ void WaypointBehaviourSelector::setScale(float scale) {
     this->m_label->setScale(std::clamp(scale + 0.3f, 0.0f, 1.0f));
 }
 
-void WaypointBehaviourSelector::setCallback(std::function<void(const Waypoints::WaypointBehaviourType)>& callback) {
+void WaypointBehaviourSelector::setCallback(const std::function<void(const Waypoints::WaypointBehaviourType)>& callback) {
     this->m_callback = callback;
 }
