@@ -46,8 +46,9 @@ namespace AutoPauseMod::UI::Main {
             void onRowEnabledToggleClicked(CCObject* sender);
             void onDeleteAllWaypointsButtonClicked(CCObject*);
             void onDisableAllWaypointsButtonClicked(CCObject*);
+            void onInfoButtonClicked(CCObject*);
 
-            CCNode* GetWaypointUI(const Waypoints::Waypoint* waypoint) const;
+            [[nodiscard]] CCNode* GetWaypointUI(const Waypoints::Waypoint* waypoint) const;
             std::optional<std::weak_ptr<Waypoints::Waypoint>> GetAssociatedWaypoint(CCNode* ui) const;
             CCNode* ResolveWaypointUIRoot(CCNode* current);
 

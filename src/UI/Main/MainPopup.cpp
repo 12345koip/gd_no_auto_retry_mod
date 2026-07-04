@@ -117,6 +117,7 @@ bool MainMenuPopup::init() {
     );
 
     this->m_mainLayer->addChild(label_waypoints);
+    //-----//
 
 
     //new waypoint button.
@@ -132,6 +133,17 @@ bool MainMenuPopup::init() {
     button_new->setPosition({33.0f, 143.0f});
     menu->addChild(button_new);
 
+    //information button.
+    auto button_info = CCMenuItemSpriteExtra::create(
+        CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png"),
+        this,
+        menu_selector(MainMenuPopup::onInfoButtonClicked)
+    );
+    button_info->setLayoutOptions(AxisLayoutOptions::create()->setAutoScale(false));
+    button_info->m_baseScale = 0.8f;
+    button_info->setScale(0.8f);
+    button_info->setPosition(353.0f, 143.0f);
+    menu->addChild(button_info);
 
     //delete all waypoints button.
     auto button_deleteAll = CCMenuItemSpriteExtra::create(
@@ -159,6 +171,8 @@ bool MainMenuPopup::init() {
     button_disableAll->setScale(0.7f);
     button_disableAll->setPosition(33.0f, 82.0f);
     menu->addChild(button_disableAll);
+
+
 
     return true;
 }
@@ -505,4 +519,17 @@ void MainMenuPopup::onDeleteAllWaypointsButtonClicked(CCObject*) {
             this->m_waypointUIMap.clear();
         }
     );
+}
+
+void MainMenuPopup::onInfoButtonClicked(CCObject*) {
+    FLAlertLayer::create(
+        "Waypoint Help",
+
+        "<cp>Global</c> - Waypoint functions across all levels"
+        "\n<cy>StartPos Only (SP)</c> - When you reach a certain percentage from your start position"
+        "\n<cy>Start Only (STA)</c> - When you reach a certain percentage from the start"
+        "\n<cy>Anywhere (ANY)</c> - Both",
+
+        "Ok"
+    )->show();
 }
