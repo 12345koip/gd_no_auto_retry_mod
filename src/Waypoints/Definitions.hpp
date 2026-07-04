@@ -21,12 +21,30 @@ namespace AutoPauseMod::Waypoints {
     };
 
     inline WaypointBehaviourType GetNextWaypointType(const WaypointBehaviourType currentType) {
-        if (currentType == WaypointBehaviourType::FromAnywhere)
-            return WaypointBehaviourType::FromStartPosOnly;
-
         return static_cast<WaypointBehaviourType>(
-            static_cast<uint8_t>(currentType) + 1
+            (static_cast<uint8_t>(currentType) + 1) % 3
         );
+    }
+
+    inline WaypointBehaviourType GetPreviousWaypointType(const WaypointBehaviourType currentType) {
+        return static_cast<WaypointBehaviourType>(
+            (static_cast<uint8_t>(currentType) + 2) % 3
+        );
+    }
+
+    inline const char* WaypointTypeToString(const WaypointBehaviourType type) {
+        switch (type) {
+            case WaypointBehaviourType::FromAnywhere:
+                return "ANY";
+            case WaypointBehaviourType::FromStartOnly:
+                return "STA";
+            case WaypointBehaviourType::FromStartPosOnly:
+                return "SP";
+
+
+            default:
+                return "UNK";
+        }
     }
 
     class Waypoint final {
