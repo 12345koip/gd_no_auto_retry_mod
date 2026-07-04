@@ -57,6 +57,9 @@ namespace AutoPauseMod::DataManagement {
                 return &dataManager;
             }
 
+            void UpdateWaypointListPosition(const std::shared_ptr<Waypoints::Waypoint>& waypoint);
+            void DeleteAllWaypoints();
+
             [[nodiscard]] bool GetIgnoreState() const {return this->m_bIgnoreState;}
 
             void ToggleWaypoint(const std::shared_ptr<Waypoints::Waypoint>& waypoint);

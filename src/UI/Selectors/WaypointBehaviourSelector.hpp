@@ -34,7 +34,7 @@ namespace AutoPauseMod::UI::Selectors {
             }
 
             void setScale(float scale) override;
-            void setCallback(std::function<void(const Waypoints::WaypointBehaviourType)>& callback);
+            void setCallback(const std::function<void(const Waypoints::WaypointBehaviourType)>& callback);
             Waypoints::WaypointBehaviourType GetSelectedBehaviourType() const {return this->m_index;};
     };
 }

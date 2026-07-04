@@ -31,16 +31,6 @@ void Waypoint::SetLevelID(int newLevelId) {
     this->m_levelID = newLevelId;
 }
 
-bool Waypoint::operator==(const std::shared_ptr<Waypoint>& other) const {
-    return (
-        this->m_levelID == other->GetLevelID() &&
-        this->m_bIsGlobal == other->IsGlobal() &&
-        this->m_bEnabled == other->IsEnabled() &&
-        this->m_activationPercentage == other->GetTriggerPercentage() &&
-        this->m_behaviourType == other->GetBehaviourType()
-    );
-}
-
 static bool ValidatePercentage(const DataManager* dataManager, const float currentPercentage, const float activationPercentage, const WaypointBehaviourType behaviourType) {
     //from anywhere - you reach a certain percentage in the level OR get a certain percentage relative to your start position
     //from start pos only - you reach a certain percentage relative to your start position
@@ -94,9 +84,4 @@ std::shared_ptr<Waypoint> Waypoint::FromWaypointInformation(const DataPersistenc
     waypoint->SetEnabled(info.enabled);
 
     return waypoint;
-}
-
-Waypoint::~Waypoint() {
-    if (auto* popup = DataManager::GetSingleton()->GetMenuPopup())
-        popup->DiscardUIForWaypoint(this);
 }
