@@ -270,7 +270,7 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
 
 
     //selector.
-    auto selector = Selectors::ThreeWaySelector::create();
+    auto selector = Selectors::WaypointBehaviourSelector::create();
     selector->setPosition({222.0f, 13.0f});
     selector->setScale(0.5f);
     row->addChild(selector);
