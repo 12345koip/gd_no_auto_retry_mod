@@ -7,7 +7,7 @@
 #include <functional>
 
 namespace AutoPauseMod::UI::Selectors {
-    class ThreeWaySelector final: public cocos2d::CCNode {
+    class WaypointBehaviourSelector final: public cocos2d::CCNode {
         private:
             cocos2d::CCMenu* m_menu = nullptr;
             cocos2d::CCLabelBMFont* m_label = nullptr;
@@ -21,8 +21,8 @@ namespace AutoPauseMod::UI::Selectors {
             bool init() override;
 
         public:
-            static ThreeWaySelector* create() {
-                auto selector = new ThreeWaySelector();
+            static WaypointBehaviourSelector* create() {
+                auto selector = new WaypointBehaviourSelector();
 
                 if (selector->init()) {
                     selector->autorelease();
@@ -35,6 +35,6 @@ namespace AutoPauseMod::UI::Selectors {
 
             void setScale(float scale) override;
             void setCallback(std::function<void(const Waypoints::WaypointBehaviourType)>& callback);
-            Waypoints::WaypointBehaviourType GetSelected() const {return this->m_index;};
+            Waypoints::WaypointBehaviourType GetSelectedBehaviourType() const {return this->m_index;};
     };
 }

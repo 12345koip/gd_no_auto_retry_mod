@@ -9,7 +9,7 @@
 using namespace geode::prelude;
 using namespace AutoPauseMod::UI::Selectors;
 
-void ThreeWaySelector::onLeftButtonClicked(CCObject*) {
+void WaypointBehaviourSelector::onLeftButtonClicked(CCObject*) {
     this->m_index = Waypoints::GetPreviousWaypointType(this->m_index);
     this->m_label->setString(Waypoints::WaypointTypeToString(this->m_index));
 
@@ -17,7 +17,7 @@ void ThreeWaySelector::onLeftButtonClicked(CCObject*) {
         this->m_callback(this->m_index);
 }
 
-void ThreeWaySelector::onRightButtonClicked(CCObject*) {
+void WaypointBehaviourSelector::onRightButtonClicked(CCObject*) {
     this->m_index = Waypoints::GetNextWaypointType(this->m_index);
     this->m_label->setString(Waypoints::WaypointTypeToString(this->m_index));
 
@@ -25,7 +25,7 @@ void ThreeWaySelector::onRightButtonClicked(CCObject*) {
         this->m_callback(this->m_index);
 }
 
-bool ThreeWaySelector::init() {
+bool WaypointBehaviourSelector::init() {
     if (!CCNode::init()) return false;
 
     auto menu = CCMenu::create();
@@ -35,13 +35,13 @@ bool ThreeWaySelector::init() {
     auto left = CCMenuItemSpriteExtra::create(
         CCSprite::createWithSpriteFrameName("edit_leftBtn_001.png"),
         this,
-        menu_selector(ThreeWaySelector::onLeftButtonClicked)
+        menu_selector(WaypointBehaviourSelector::onLeftButtonClicked)
     );
 
     auto right = CCMenuItemSpriteExtra::create(
         CCSprite::createWithSpriteFrameName("edit_rightBtn_001.png"),
         this,
-        menu_selector(ThreeWaySelector::onRightButtonClicked)
+        menu_selector(WaypointBehaviourSelector::onRightButtonClicked)
     );
 
     this->m_label = CCLabelBMFont::create(
@@ -61,11 +61,11 @@ bool ThreeWaySelector::init() {
     return true;
 }
 
-void ThreeWaySelector::setScale(float scale) {
+void WaypointBehaviourSelector::setScale(float scale) {
     CCNode::setScale(scale);
     this->m_label->setScale(std::clamp(scale + 0.3f, 0.0f, 1.0f));
 }
 
-void ThreeWaySelector::setCallback(std::function<void(const Waypoints::WaypointBehaviourType)>& callback) {
+void WaypointBehaviourSelector::setCallback(std::function<void(const Waypoints::WaypointBehaviourType)>& callback) {
     this->m_callback = callback;
 }
