@@ -24,10 +24,12 @@ class $modify(PlayLayer) {
 
 
     void destroyPlayer(PlayerObject* player, GameObject* object) override {
-        const auto* DataManager = DataManager::GetSingleton();
-
         if (object == this->m_anticheatSpike)
             return PlayLayer::destroyPlayer(player, object);
+
+
+
+        const auto* DataManager = DataManager::GetSingleton();
 
         if (DataManager->GetIgnoreState() || (this->m_isPracticeMode && DataManager->GetIgnorePracticeMode()))
             return PlayLayer::destroyPlayer(player, object);
