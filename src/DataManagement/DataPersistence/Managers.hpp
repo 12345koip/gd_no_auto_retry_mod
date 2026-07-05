@@ -31,12 +31,9 @@ namespace AutoPauseMod::DataManagement::DataPersistence {
         static WaypointInformation FromWaypoint(const std::shared_ptr<Waypoints::Waypoint>& waypoint);
     };
 
-    //NOTE: *FOR THE SAKE of performance and memory and all that lovely stuff*
-    //this function EXPECTS that the WaypointList passed
-    //contains waypoints *ENTIRELY* specific to a level, or *ENTIRELY* global
-    //DataManager SHOULD HANDLE moving them between the two lists appropriately
-    void SerialiseAndSaveWaypoints(const WaypointList& waypoints);
+    //NOTE: editor level ID keys are appended with "e".
+    void SerialiseAndSaveWaypoints(const WaypointList& waypoints, int levelID = 0, bool isEditorLevel = false);
 
-    WaypointList LoadLevelWaypoints(const int levelId);
+    WaypointList LoadLevelWaypoints(const int levelId, bool isEditorLevel = false);
     WaypointList LoadGlobalWaypoints();
 }
