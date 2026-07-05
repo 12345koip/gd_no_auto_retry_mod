@@ -9,6 +9,8 @@
 #include <unordered_map>
 #include <optional>
 
+#include "../../DataManagement/DataPersistence/Managers.hpp"
+
 namespace AutoPauseMod::Waypoints {
     class Waypoint;
 }
@@ -37,6 +39,8 @@ namespace AutoPauseMod::UI::Main {
                 delete popup;
                 return nullptr;
             }
+
+            void FlushAndRebuildList(const DataManagement::DataPersistence::WaypointList& globalWaypoints, const DataManagement::DataPersistence::WaypointList& levelWaypoints);
 
             void onPracticeToggleClicked(CCObject* sender);
             void onNewBestToggleClicked(CCObject* sender);

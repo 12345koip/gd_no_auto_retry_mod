@@ -69,3 +69,8 @@ void WaypointBehaviourSelector::setScale(float scale) {
 void WaypointBehaviourSelector::setCallback(const std::function<void(const Waypoints::WaypointBehaviourType)>& callback) {
     this->m_callback = callback;
 }
+
+void WaypointBehaviourSelector::setState(const Waypoints::WaypointBehaviourType newState) {
+    this->m_index = newState;
+    this->m_label->setString(Waypoints::WaypointTypeToString(newState));
+}
