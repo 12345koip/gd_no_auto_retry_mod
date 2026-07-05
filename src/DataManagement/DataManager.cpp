@@ -11,34 +11,6 @@ using namespace AutoPauseMod::DataManagement;
 using namespace AutoPauseMod::Waypoints;
 using namespace geode::prelude;
 
-void DataManager::UpdateLevelInformation() {
-    PlayLayer* playLayer = PlayLayer::get();
-    auto* level = playLayer? playLayer->m_level: nullptr;
-
-    DataPersistence::SerialiseAndSaveWaypoints(this->m_loadedLevelWaypoints);
-    this->m_loadedLevelWaypoints.clear();
-
-    //ignore unsupported game states.
-    if (!level || level->isPlatformer() || LevelEditorLayer::get()) {
-        this->m_bIgnoreState = true;
-        return;
-    } else this->m_bIgnoreState = false;
-
-    //for editor levels, we'll use the level ID api
-    this->m_currentLevelID = level->m_isUploaded? level->m_levelID.value(): EditorIDs::getID(level);
-
-    //...and load those waypoints.
-    this->m_loadedLevelWaypoints = DataPersistence::LoadLevelWaypoints(this->m_currentLevelID);
-
-    std::ranges::sort(this->m_loadedLevelWaypoints,
-    [](const std::shared_ptr<Waypoint>& a, const std::shared_ptr<Waypoint>& b) -> bool {
-            return a->GetTriggerPercentage() < b->GetTriggerPercentage();
-        }
-    );
-
-    //TODO: update UI when i actually made it sob
-}
-
 
 
 std::shared_ptr<Waypoint> DataManager::NewWaypoint() {
@@ -81,7 +53,7 @@ void DataManager::ToggleWaypoint(const std::shared_ptr<Waypoint>& waypoint) {
         this->m_loadedGlobalWaypoints.insert(pos, waypoint);
 
         //we have a new global waypoint, save data
-        DataPersistence::SerialiseAndSaveWaypoints(this->m_loadedGlobalWaypoints);
+        this->SaveGlobalWaypointInformation();
     }
 
     else {
@@ -101,6 +73,7 @@ void DataManager::ToggleWaypoint(const std::shared_ptr<Waypoint>& waypoint) {
         );
 
         this->m_loadedLevelWaypoints.insert(pos, waypoint);
+        this->SaveLevelWaypointInformation();
     }
 }
 
@@ -109,13 +82,14 @@ void DataManager::DeleteWaypoint(const std::shared_ptr<Waypoint>& waypoint) {
         auto it = std::ranges::find(this->m_loadedGlobalWaypoints, waypoint);
         if (it != this->m_loadedGlobalWaypoints.end()) this->m_loadedGlobalWaypoints.erase(it);
 
-        //global waypoints changed, save em
-        DataPersistence::SerialiseAndSaveWaypoints(this->m_loadedGlobalWaypoints);
+        this->SaveGlobalWaypointInformation();
     }
 
     else {
         auto it = std::ranges::find(this->m_loadedLevelWaypoints, waypoint);
         if (it != this->m_loadedLevelWaypoints.end()) this->m_loadedLevelWaypoints.erase(it);
+
+        this->SaveLevelWaypointInformation();
     }
 }
 
@@ -140,11 +114,54 @@ void DataManager::ShowMenuPopup() const {
 void DataManager::DeleteAllWaypoints() {
     this->m_loadedGlobalWaypoints.clear();
     this->m_loadedLevelWaypoints.clear();
+
+    this->SaveGlobalWaypointInformation();
+    this->SaveLevelWaypointInformation();
 }
 
 void DataManager::SetShouldIgnorePracticeMode(bool newState) {
     this->m_bIgnorePracticeMode = newState;
     Mod::get()->setSavedValue<bool>("ignorePracticeMode", newState);
+}
+
+void DataManager::SaveGlobalWaypointInformation() {
+    std::lock_guard lock (this->m_waypointSaveLoadOperationMutex);
+
+    DataPersistence::SerialiseAndSaveWaypoints(this->m_loadedGlobalWaypoints);
+    log::debug("saved {} global waypoints", this->m_loadedGlobalWaypoints.size());
+}
+
+void DataManager::SaveLevelWaypointInformation() {
+    if (this->m_currentLevelID == 0) return;
+    std::lock_guard lock (this->m_waypointSaveLoadOperationMutex);
+
+    DataPersistence::SerialiseAndSaveWaypoints(this->m_loadedLevelWaypoints, this->m_currentLevelID);
+    log::debug("saved {} waypoints for level {}", this->m_loadedLevelWaypoints.size(), this->m_currentLevelID, this->m_bIsEditorLevel);
+}
+
+void DataManager::UpdateForLevelInformation(GJGameLevel* level) {
+    std::lock_guard lock (this->m_waypointSaveLoadOperationMutex);
+
+    if (!level || level->isPlatformer() || LevelEditorLayer::get()) {
+        this->m_bIgnoreState = true;
+        this->m_currentLevelID = 0;
+        log::debug("ignoring unsupported level type.");
+        return;
+    } else this->m_bIgnoreState = false;
+
+    if (level->m_levelType == GJLevelType::Editor) {
+        this->m_currentLevelID = level->m_levelID.value();
+        this->m_bIsEditorLevel = false;
+    } else {
+        this->m_currentLevelID = EditorIDs::getID(level);
+        this->m_bIsEditorLevel = true;
+    }
+
+    //load waypoints.
+    this->m_loadedLevelWaypoints = DataPersistence::LoadLevelWaypoints(this->m_currentLevelID, this->m_bIsEditorLevel);
+    log::debug("loaded {} waypoints for level {}", this->m_loadedLevelWaypoints.size(), level->m_levelID);
+
+    this->DiscardPopup();
 }
 
 bool DataManager::CheckWaypoints(const float currentPercentage) const {

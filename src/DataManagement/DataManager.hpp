@@ -6,6 +6,7 @@
 #include <Geode/Geode.hpp>
 #include <memory>
 #include <vector>
+#include <mutex>
 #include "../Waypoints/Definitions.hpp"
 #include "DataPersistence/Managers.hpp"
 
@@ -28,6 +29,7 @@ namespace AutoPauseMod::DataManagement {
 
             float m_attemptStartPercent = 0;
             int m_currentLevelID = 0;
+            bool m_bIsEditorLevel = false;
 
             bool m_bPauseOnNewBest = true;
             bool m_bIgnorePracticeMode = true;
@@ -37,7 +39,7 @@ namespace AutoPauseMod::DataManagement {
             //ignore all events
             bool m_bIgnoreState = false;
 
-
+            std::mutex m_waypointSaveLoadOperationMutex {};
 
 
             void RefreshWaypoints(); //will be called after a new level is entered.
@@ -61,6 +63,7 @@ namespace AutoPauseMod::DataManagement {
             void DeleteAllWaypoints();
 
             [[nodiscard]] bool GetIgnoreState() const {return this->m_bIgnoreState;}
+            [[nodiscard]] int GetCurrentStoredLevelID() const {return this->m_currentLevelID;}
 
             void ToggleWaypoint(const std::shared_ptr<Waypoints::Waypoint>& waypoint);
             void DeleteWaypoint(const std::shared_ptr<Waypoints::Waypoint>& waypoint);
@@ -75,7 +78,10 @@ namespace AutoPauseMod::DataManagement {
             //the user can toggle it to be global afterwards if they want.
             std::shared_ptr<Waypoints::Waypoint> NewWaypoint();
 
-            void UpdateLevelInformation();
+            void UpdateForLevelInformation(GJGameLevel* level);
+            void SaveLevelWaypointInformation();
+            void SaveGlobalWaypointInformation();
+
             [[nodiscard]] float GetAttemptStartPercentage() const {return this->m_attemptStartPercent;}
             void SetAttemptStartPercentage(float percentage);
 

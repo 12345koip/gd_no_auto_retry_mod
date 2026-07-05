@@ -313,7 +313,7 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
             if (auto waypoint = weakWaypoint.lock()) {
                 waypoint->SetTriggerPercentage(newPercent);
                 DataManager::GetSingleton()->UpdateWaypointListPosition(waypoint);
-            }
+            } else log::warn("waypoint expired");
         }
     );
 
@@ -382,6 +382,7 @@ void MainMenuPopup::onNewWaypointButtonClicked(CCObject*) {
     scroller->scrollToTop();
 
     this->m_waypointUIMap.insert(std::make_pair(row, test_wp));
+    DataManager::GetSingleton()->SaveLevelWaypointInformation();
 }
 
 CCNode* MainMenuPopup::ResolveWaypointUIRoot(CCNode* current) {
@@ -416,7 +417,8 @@ void MainMenuPopup::onRowGlobalToggleClicked(CCObject* sender) {
         return;
     }
 
-    DataManager::GetSingleton()->ToggleWaypoint(waypoint);
+    auto* DataManager = DataManager::GetSingleton();
+    DataManager->ToggleWaypoint(waypoint);
 
     //get + update "global" toggle.
     auto toggler = static_cast<CCMenuItemToggler*>(row->getChildByID(GENERIC_WAYPOINT_GLOBAL_TOGGLE_NAME));
@@ -448,6 +450,11 @@ void MainMenuPopup::onRowEnabledToggleClicked(CCObject* sender) {
     bool enabled = !toggler->m_toggled;
     toggler->toggle(enabled);
     waypoint->SetEnabled(enabled);
+
+    if (waypoint->IsGlobal())
+        DataManager::GetSingleton()->SaveGlobalWaypointInformation();
+    else
+        DataManager::GetSingleton()->SaveLevelWaypointInformation();
 }
 
 void MainMenuPopup::onRowDeleteButtonClicked(CCObject* sender) {
@@ -477,7 +484,7 @@ void MainMenuPopup::onRowDeleteButtonClicked(CCObject* sender) {
         "Yes", "No",
         [row, waypoint](auto, bool didClickNo) -> void {
             if (didClickNo) return;
-            DataManager::GetSingleton()->DeleteWaypoint(waypoint);
+            DataManager::GetSingleton()->DeleteWaypoint(waypoint); //this also calls a save.
             row->removeFromParent();
         }
     );
@@ -500,6 +507,10 @@ void MainMenuPopup::onDisableAllWaypointsButtonClicked(CCObject*) {
                     toggle->toggle(false);
                 }
             }
+
+            auto* DataManager = DataManager::GetSingleton();
+            DataManager->SaveGlobalWaypointInformation();
+            DataManager->SaveLevelWaypointInformation();
         }
     );
 }

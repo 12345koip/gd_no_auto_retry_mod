@@ -12,16 +12,34 @@ using namespace AutoPauseMod::DataManagement;
 using namespace geode::prelude;
 
 class $modify(PlayLayer) {
-    void resetLevel() override {
-        auto* DataManager = DataManager::GetSingleton();
 
-        float currentPercent = PlayLayer::getCurrentPercent();
-
-        DataManager->SetAttemptStartPercentage(currentPercent);
-        PlayLayer::resetLevel();
+    //hooking PlayLayer::onEnter results in our detour not
+    //actually being called, so we will make do here instead.
+    void onEnterTransitionDidFinish() override {
+        PlayLayer::onEnterTransitionDidFinish();
+        const bool isEditorLevel = this->m_level->m_levelType == GJLevelType::Editor;
+        log::debug("level enter: {} isEditorLevel: {}", this->m_level->m_levelID, isEditorLevel);
+        DataManager::GetSingleton()->UpdateForLevelInformation(this->m_level);
     }
 
+    /*
+    NOTE: instead of saving when a level exits (which has proven to be unreliable)
+    we only actually need to save when any waypoint information changes,
+    so saves are requested from the UI event handlers.
 
+    This isn't going to get horribly expensive as there'll only be as many waypoints
+    as the player creates, and listening for exit is inherently unreliable.
+    */
+
+
+    void resetLevel() override {
+        PlayLayer::resetLevel();
+
+        auto* DataManager = DataManager::GetSingleton();
+        float currentPercent = PlayLayer::getCurrentPercent();
+        DataManager->SetAttemptStartPercentage(currentPercent);
+        log::debug("new attempt started at {}", currentPercent);
+    }
 
     void destroyPlayer(PlayerObject* player, GameObject* object) override {
         if (object == this->m_anticheatSpike)
@@ -53,6 +71,8 @@ class $modify(PlayLayer) {
 class $modify(ModifiedPauseLayer, PauseLayer) {
     void customSetup() override {
         PauseLayer::customSetup();
+
+        if (DataManager::GetSingleton()->GetIgnoreState()) return;
 
         CCNode* menu = this->getChildByID("bottom-button-menu");
         if (!menu) return;

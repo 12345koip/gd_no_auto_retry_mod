@@ -46,8 +46,8 @@ template<> struct matjson::Serialize<WaypointInformation> {
 
 
 
-WaypointList DataPersistence::LoadLevelWaypoints(const int levelId) {
-    const std::string levelKey = std::to_string(levelId);
+WaypointList DataPersistence::LoadLevelWaypoints(const int levelId, bool isEditorLevel) {
+    const std::string levelKey = !isEditorLevel? std::to_string(levelId): std::to_string(levelId) + "e";
     auto waypointInfoList = Mod::get()->getSavedValue<std::vector<WaypointInformation>>(levelKey, {});
 
     WaypointList waypoints {};
@@ -71,13 +71,16 @@ WaypointList DataPersistence::LoadGlobalWaypoints() {
     return waypoints;
 }
 
-//please read the note i wrote for this in the header, thanks :3
-void DataPersistence::SerialiseAndSaveWaypoints(const WaypointList& waypoints) {
-    if (waypoints.empty()) return;
+void DataPersistence::SerialiseAndSaveWaypoints(const WaypointList& waypoints, int levelID, bool isEditorLevel) {
+    const bool isGlobal = levelID == 0;
 
-    //gonna read the FIRST one to see if its global, hence why that notes so important
-    const auto& firstWaypoint = waypoints[0];
-    const bool isGlobal = firstWaypoint->IsGlobal();
+
+    std::string levelKey {};
+    if (isGlobal)
+        levelKey = "global";
+    else
+        levelKey = isEditorLevel? std::to_string(levelID) + "e": std::to_string(levelID);
+
 
     std::vector<WaypointInformation> waypointInfos {};
     waypointInfos.reserve(waypoints.size());
@@ -86,7 +89,7 @@ void DataPersistence::SerialiseAndSaveWaypoints(const WaypointList& waypoints) {
         waypointInfos.push_back(WaypointInformation::FromWaypoint(waypoint));
 
     Mod::get()->setSavedValue<std::vector<WaypointInformation>>(
-        isGlobal? "global": std::to_string(firstWaypoint->GetLevelID()),
+        isGlobal? "global": std::to_string(levelID),
         waypointInfos
     );
 }
