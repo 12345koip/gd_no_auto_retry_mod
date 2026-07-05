@@ -31,6 +31,8 @@ std::shared_ptr<Waypoint> DataManager::NewWaypoint() {
     );
 
     this->m_loadedLevelWaypoints.insert(pos, waypoint);
+    this->SaveLevelWaypointInformation();
+
     return waypoint;
 }
 
@@ -150,11 +152,11 @@ void DataManager::UpdateForLevelInformation(GJGameLevel* level) {
     } else this->m_bIgnoreState = false;
 
     if (level->m_levelType == GJLevelType::Editor) {
-        this->m_currentLevelID = level->m_levelID.value();
-        this->m_bIsEditorLevel = false;
-    } else {
         this->m_currentLevelID = EditorIDs::getID(level);
         this->m_bIsEditorLevel = true;
+    } else {
+        this->m_currentLevelID = level->m_levelID.value();
+        this->m_bIsEditorLevel = false;
     }
 
     //load waypoints.
@@ -184,7 +186,7 @@ void DataManager::UpdateWaypointListPosition(const std::shared_ptr<Waypoints::Wa
     std::erase(waypoints, waypoint);
 
     auto pos = std::ranges::lower_bound(
-    this->m_loadedGlobalWaypoints,
+    waypoints,
     waypoint->GetTriggerPercentage(),
     {},
     &Waypoint::GetTriggerPercentage
