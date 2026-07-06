@@ -56,7 +56,8 @@ class $modify(PlayLayer) {
         const float currentPercentage = this->getCurrentPercent();
         this->destroyPlayer(player, object);
 
-        const bool isNewBest = (currentPercentage > currentBest) && !this->m_isPracticeMode;
+        const bool isNewBest = DataManager->GetAttemptStartPercentage() <= 0.01f &&
+            (currentPercentage > currentBest) && !this->m_isPracticeMode;
 
         /*
          * pause on either:

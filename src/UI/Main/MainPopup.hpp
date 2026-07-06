@@ -22,6 +22,7 @@ namespace AutoPauseMod::UI::Main {
             bool init() override;
 
             std::unordered_map<CCNode*, std::weak_ptr<Waypoints::Waypoint>> m_waypointUIMap {};
+            geode::ScrollLayer* m_scroller = nullptr;
 
             //TODO: add hooks to listen for exiting a level, and have the UI discarded then.
 

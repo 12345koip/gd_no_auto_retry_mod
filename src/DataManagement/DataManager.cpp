@@ -39,7 +39,10 @@ std::shared_ptr<Waypoint> DataManager::NewWaypoint() {
 void DataManager::ToggleWaypoint(const std::shared_ptr<Waypoint>& waypoint) {
     if (!waypoint->IsGlobal()) {
         const auto it = std::ranges::find(this->m_loadedLevelWaypoints, waypoint);
-        if (it == this->m_loadedLevelWaypoints.end()) return;
+        if (it == this->m_loadedLevelWaypoints.end()) {
+            log::warn("waypoint not found in level waypoint list when global toggling");
+            return;
+        }
 
         this->m_loadedLevelWaypoints.erase(it);
 
@@ -53,14 +56,14 @@ void DataManager::ToggleWaypoint(const std::shared_ptr<Waypoint>& waypoint) {
         );
 
         this->m_loadedGlobalWaypoints.insert(pos, waypoint);
-
-        //we have a new global waypoint, save data
-        this->SaveGlobalWaypointInformation();
     }
 
     else {
         const auto it = std::ranges::find(this->m_loadedGlobalWaypoints, waypoint);
-        if (it == this->m_loadedGlobalWaypoints.end()) return;
+        if (it == this->m_loadedGlobalWaypoints.end()) {
+            log::warn("waypoint not found in global waypoint list when global toggling");
+            return;
+        }
 
         this->m_loadedGlobalWaypoints.erase(it);
 
@@ -75,8 +78,10 @@ void DataManager::ToggleWaypoint(const std::shared_ptr<Waypoint>& waypoint) {
         );
 
         this->m_loadedLevelWaypoints.insert(pos, waypoint);
-        this->SaveLevelWaypointInformation();
     }
+
+    this->SaveGlobalWaypointInformation();
+    this->SaveLevelWaypointInformation();
 }
 
 void DataManager::DeleteWaypoint(const std::shared_ptr<Waypoint>& waypoint) {
@@ -134,10 +139,11 @@ void DataManager::SaveGlobalWaypointInformation() {
 }
 
 void DataManager::SaveLevelWaypointInformation() {
-    if (this->m_currentLevelID == 0) return;
+    if (this->m_currentLevelID == 0 && !this->m_bIsEditorLevel) return;
     std::lock_guard lock (this->m_waypointSaveLoadOperationMutex);
 
-    DataPersistence::SerialiseAndSaveWaypoints(this->m_loadedLevelWaypoints, this->m_currentLevelID);
+    DataPersistence::SerialiseAndSaveWaypoints(this->m_loadedLevelWaypoints, this->m_currentLevelID, this->m_bIsEditorLevel);
+    log::debug("save request for level {} isEditorLevel: {}", this->m_currentLevelID, this->m_bIsEditorLevel);
     log::debug("saved {} waypoints for level {}", this->m_loadedLevelWaypoints.size(), this->m_currentLevelID, this->m_bIsEditorLevel);
 }
 
@@ -151,17 +157,19 @@ void DataManager::UpdateForLevelInformation(GJGameLevel* level) {
         return;
     } else this->m_bIgnoreState = false;
 
-    if (level->m_levelType == GJLevelType::Editor) {
+    if (level->m_levelType == GJLevelType::Editor) { //only playtesting is supported for editor levels.
         this->m_currentLevelID = EditorIDs::getID(level);
         this->m_bIsEditorLevel = true;
+        log::debug("entered level is editor level; editor level ID: {}", this->m_currentLevelID);
     } else {
         this->m_currentLevelID = level->m_levelID.value();
         this->m_bIsEditorLevel = false;
+        log::debug("entered level is not an editor level; level ID: {}", this->m_currentLevelID);
     }
 
     //load waypoints.
     this->m_loadedLevelWaypoints = DataPersistence::LoadLevelWaypoints(this->m_currentLevelID, this->m_bIsEditorLevel);
-    log::debug("loaded {} waypoints for level {}", this->m_loadedLevelWaypoints.size(), level->m_levelID);
+    log::debug("loaded {} waypoints for level {}", this->m_loadedLevelWaypoints.size(), this->m_currentLevelID);
 
     this->DiscardPopup();
 }
@@ -193,6 +201,11 @@ void DataManager::UpdateWaypointListPosition(const std::shared_ptr<Waypoints::Wa
     );
 
     waypoints.insert(pos, waypoint);
+
+    if (waypoint->IsGlobal())
+        this->SaveGlobalWaypointInformation();
+    else
+        this->SaveLevelWaypointInformation();
 }
 
 //gonna do some textbook RAII bc uhh its cool :3

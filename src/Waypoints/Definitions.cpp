@@ -43,7 +43,7 @@ static bool ValidatePercentage(const DataManager* dataManager, const float curre
             return currentPercentage >= activationPercentage || currentPercentage - startPos >= activationPercentage;
 
         case WaypointBehaviourType::FromStartPosOnly:
-            return currentPercentage - startPos >= activationPercentage;
+            return startPos >= 0.01f && (currentPercentage - startPos >= activationPercentage);
 
         case WaypointBehaviourType::FromStartOnly:
             return startPos <= 0.01f && currentPercentage >= activationPercentage;
