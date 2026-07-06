@@ -4,9 +4,6 @@
 
 #include <Geode/Geode.hpp>
 #include "MainPopup.hpp"
-
-#include <__msvc_ranges_to.hpp>
-
 #include "../../DataManagement/DataManager.hpp"
 #include "../Selectors/WaypointBehaviourSelector.hpp"
 
@@ -14,7 +11,6 @@ using namespace AutoPauseMod::UI::Main;
 using namespace AutoPauseMod::DataManagement;
 using namespace geode::prelude;
 
-#define WAYPOINT_SCROLLER_NAME "waypoint_scroller"_spr
 #define GENERIC_WAYPOINT_ROW_NAME "WaypointRow"_spr
 #define GENERIC_WAYPOINT_ENABLED_TOGGLE_NAME "enabledToggler"_spr
 #define GENERIC_WAYPOINT_GLOBAL_TOGGLE_NAME "globalToggler"_spr
@@ -94,14 +90,13 @@ bool MainMenuPopup::init() {
         true,
         true
     );
+    this->m_scroller = scroller;
 
 
     scroller->m_bIgnoreAnchorPointForPosition = false;
     scroller->m_contentLayer->setLayout(
         ScrollLayer::createDefaultListLayout(6.0f)
     );
-
-    scroller->setID(WAYPOINT_SCROLLER_NAME);
 
     this->m_mainLayer->addChildAtPosition(scroller, Anchor::Center, {0.0f, -35.0f});
 
@@ -308,16 +303,24 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
     //callbacks.
     selector->setCallback(
         [weakWaypoint = std::weak_ptr(waypoint)](const Waypoints::WaypointBehaviourType newBehaviourType) -> void {
-            if (auto waypoint = weakWaypoint.lock()) {
-                waypoint->SetBehaviourType(newBehaviourType);
-                log::debug("updated waypoint behaviour type to {}", Waypoints::WaypointTypeToString(newBehaviourType));
-            } else
+            if (weakWaypoint.expired()) {
                 log::debug("could not update behaviour type: waypoint expired.");
+                return;
+            }
+
+            auto waypoint = weakWaypoint.lock();
+            waypoint->SetBehaviourType(newBehaviourType);
+            log::debug("updated waypoint behaviour type to {}", Waypoints::WaypointTypeToString(newBehaviourType));
+
+            if (waypoint->IsGlobal())
+                DataManager::GetSingleton()->SaveGlobalWaypointInformation();
+            else
+                DataManager::GetSingleton()->SaveLevelWaypointInformation();
         }
     );
 
     input->setCallback(
-        [weakWaypoint = std::weak_ptr(waypoint), input](const std::string& newContents) -> void {
+        [weakWaypoint = std::weak_ptr(waypoint)](const std::string& newContents) -> void {
             auto result = geode::utils::numFromString<int>(newContents, 10);
             int newInput = result? result.unwrap(): 0;
             int newPercent = std::clamp(newInput, 0, 100);
@@ -333,13 +336,9 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
 
 
     //show it.
-    auto scroller = static_cast<geode::ScrollLayer*>(
-        this->m_mainLayer->getChildByID(WAYPOINT_SCROLLER_NAME)
-    );
-
-    scroller->m_contentLayer->addChild(row);
-    scroller->m_contentLayer->updateLayout();
-    scroller->scrollToTop();
+    this->m_scroller->m_contentLayer->addChild(row);
+    this->m_scroller->m_contentLayer->updateLayout();
+    this->m_scroller->scrollToTop();
 
 
     return row;
@@ -411,6 +410,8 @@ void MainMenuPopup::FlushAndRebuildList(const DataManagement::DataPersistence::W
         auto row = makeUIForWaypoint(waypoint);
         this->m_waypointUIMap.insert(std::make_pair(row, waypoint));
     }
+
+    this->m_scroller->m_contentLayer->updateLayout();
 }
 
 CCNode* MainMenuPopup::ResolveWaypointUIRoot(CCNode* current) {
@@ -475,8 +476,6 @@ void MainMenuPopup::onRowEnabledToggleClicked(CCObject* sender) {
     log::debug("toggled: {}", enabled);
     waypoint->SetEnabled(enabled);
 
-    //TODO: why dis not toggling? also remove waypoint from map when deleted
-
     if (waypoint->IsGlobal())
         DataManager::GetSingleton()->SaveGlobalWaypointInformation();
     else
@@ -515,6 +514,9 @@ void MainMenuPopup::onRowDeleteButtonClicked(CCObject* sender) {
 
             const auto it = this->m_waypointUIMap.find(row);
             this->m_waypointUIMap.erase(it);
+
+            this->m_scroller->m_contentLayer->updateLayout();
+            this->m_scroller->scrollToTop();
         }
     );
 }
@@ -557,6 +559,7 @@ void MainMenuPopup::onDeleteAllWaypointsButtonClicked(CCObject*) {
                 ui->removeFromParent();
 
             this->m_waypointUIMap.clear();
+            this->m_scroller->m_contentLayer->updateLayout();
         }
     );
 }

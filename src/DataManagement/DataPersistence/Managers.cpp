@@ -48,6 +48,8 @@ template<> struct matjson::Serialize<WaypointInformation> {
 
 WaypointList DataPersistence::LoadLevelWaypoints(const int levelId, bool isEditorLevel) {
     const std::string levelKey = isEditorLevel? std::to_string(levelId) + "e": std::to_string(levelId);
+    log::debug("processing load request. levelKey: {}", levelKey);
+
     auto waypointInfoList = Mod::get()->getSavedValue<std::vector<WaypointInformation>>(levelKey, {});
 
     WaypointList waypoints {};
@@ -60,6 +62,8 @@ WaypointList DataPersistence::LoadLevelWaypoints(const int levelId, bool isEdito
 }
 
 WaypointList DataPersistence::LoadGlobalWaypoints() {
+    log::debug("processing load request. levelKey: global");
+
     auto waypointInfoList = Mod::get()->getSavedValue<std::vector<WaypointInformation>>("global", {});
 
     WaypointList waypoints {};
@@ -81,6 +85,7 @@ void DataPersistence::SerialiseAndSaveWaypoints(const WaypointList& waypoints, i
     else
         levelKey = isEditorLevel? std::to_string(levelID) + "e": std::to_string(levelID);
 
+    log::debug("processing save request. levelKey: {}", levelKey);
 
     std::vector<WaypointInformation> waypointInfos {};
     waypointInfos.reserve(waypoints.size());
