@@ -505,10 +505,11 @@ void MainMenuPopup::onRowDeleteButtonClicked(CCObject* sender) {
     //now we prompt
     geode::createQuickPopup(
         "Confirm",
-        "Would you like to delete this waypoint?",
+        "Would you like to delete this waypoint? <cy>This cannot be undone!</c>",
         "Yes", "No",
         [this, row, waypoint](auto, bool didClickNo) -> void {
             if (didClickNo) return;
+
             DataManager::GetSingleton()->DeleteWaypoint(waypoint);
             row->removeFromParent();
 

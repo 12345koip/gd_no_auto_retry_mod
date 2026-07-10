@@ -11,28 +11,52 @@
 using namespace AutoPauseMod::DataManagement;
 using namespace geode::prelude;
 
-class $modify(PlayLayer) {
+/*
+mild crashout here.
+literally every useful function for detecting an unpause can't
+be hooked through $modify so i have this horrible workaround of
+not just one but TWO static global variables AND a per-frame poller
+on the PlayLayer.
 
-    //hooking PlayLayer::onEnter results in our detour not
-    //actually being called, so we will make do here instead.
+Not to mention Mod::hook'ing them has weird implications resulting in
+the detour never being called too.
+
+welp :3
+*/
+static bool g_doPauseResetSequence = false;
+static bool g_wasPaused = false;
+
+
+
+class $modify(ModifiedPlayLayer, PlayLayer) {
     void onEnterTransitionDidFinish() override {
         PlayLayer::onEnterTransitionDidFinish();
         const bool isEditorLevel = this->m_level->m_levelType == GJLevelType::Editor;
+
         log::debug("level enter: {} isEditorLevel: {}", this->m_level->m_levelID, isEditorLevel);
         DataManager::GetSingleton()->UpdateForLevelInformation(this->m_level);
     }
 
-    /*
-    NOTE: instead of saving when a level exits (which has proven to be unreliable)
-    we only actually need to save when any waypoint information changes,
-    so saves are requested from the UI event handlers.
 
-    This isn't going to get horribly expensive as there'll only be as many waypoints
-    as the player creates, and listening for exit is inherently unreliable.
-    */
+    void postUpdate(float dt) override {
+        PlayLayer::postUpdate(dt);
 
+        if (g_wasPaused && !this->m_isPaused && g_doPauseResetSequence) {
+            log::debug("resetting level on unpause");
+            g_wasPaused = false;
+            g_doPauseResetSequence = false;
+            this->resetLevel();
+        }
+    }
 
     void resetLevel() override {
+        if (g_doPauseResetSequence) { //block the reset if a waypoint triggered.
+            g_wasPaused = true;
+            log::debug("pausing game for waypoint");
+            PlayLayer::pauseGame(false);
+            return;
+        }
+
         PlayLayer::resetLevel();
 
         auto* DataManager = DataManager::GetSingleton();
@@ -48,24 +72,24 @@ class $modify(PlayLayer) {
 
 
         const auto* DataManager = DataManager::GetSingleton();
-
         if (DataManager->GetIgnoreState() || (this->m_isPracticeMode && DataManager->GetIgnorePracticeMode()))
             return PlayLayer::destroyPlayer(player, object);
 
         const int currentBest = this->m_level->getNormalPercent();
         const float currentPercentage = this->getCurrentPercent();
-        this->destroyPlayer(player, object);
+
+        PlayLayer::destroyPlayer(player, object);
 
         const bool isNewBest = DataManager->GetAttemptStartPercentage() <= 0.01f &&
             (currentPercentage > currentBest) && !this->m_isPracticeMode;
 
         /*
-         * pause on either:
-         * new best AND "pause on new best" setting is enabled,
-         * OR any enabled waypoint signals a pause
-         */
-        if ((isNewBest && DataManager->GetShouldPauseOnNewBest()) || DataManager->CheckWaypoints(currentPercentage))
-            PlayLayer::pauseGame(false);
+         pause on either:
+         new best AND "pause on new best" setting is enabled,
+         OR any enabled waypoint signals a pause
+        */
+        if (isNewBest && DataManager->GetShouldPauseOnNewBest() || DataManager->CheckWaypoints(currentPercentage))
+            g_doPauseResetSequence = true;
     }
 };
 
@@ -85,8 +109,7 @@ class $modify(ModifiedPauseLayer, PauseLayer) {
         );
 
         button->setLayoutOptions(
-            AxisLayoutOptions::create()
-                ->setAutoScale(false)
+            AxisLayoutOptions::create()->setAutoScale(false)
         );
 
         button->m_baseScale = 0.7f;
