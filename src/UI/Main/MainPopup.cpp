@@ -19,6 +19,7 @@ static CCMenuItemToggler* makeToggle(MainMenuPopup* target, SEL_MenuHandler call
     auto toggle = CCMenuItemToggler::createWithStandardSprites(target, callback, scale);
     toggle->toggle(defaultState);
     toggle->setPosition(position);
+    toggle->setScale(scale);
 
     return toggle;
 }
@@ -72,6 +73,7 @@ bool MainMenuPopup::init() {
         {375.0f, 195.0f},
         DataManager->GetShouldPauseOnNewBest()
     );
+
     menu->addChild(toggle_pauseOnNewBest);
 
     auto label_pauseOnNewBest = makeLabel(
@@ -198,7 +200,7 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
         "Global",
         "bigFont.fnt",
         {0.0f, 0.5f},
-        {135.0f, 17.0f},
+        {132.0f, 17.0f},
         0.5f
     );
 
@@ -219,7 +221,7 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
         "Enabled",
         "bigFont.fnt",
         {0.0f, 0.5f},
-        {58.0f, 17.0f},
+        {57.0f, 17.0f},
         0.5f
     );
     label_enabled->setScale(0.4f);
@@ -262,8 +264,8 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
         "%",
         "bigFont.fnt",
         {0.0f, 0.5f},
-        {43.0f, 17.0f},
-        0.5f
+        {42.0f, 17.0f},
+        0.4f
     );
     row->addChild(label_percentage);
 

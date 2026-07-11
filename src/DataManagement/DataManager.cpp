@@ -194,10 +194,10 @@ void DataManager::UpdateWaypointListPosition(const std::shared_ptr<Waypoints::Wa
     std::erase(waypoints, waypoint);
 
     auto pos = std::ranges::lower_bound(
-    waypoints,
-    waypoint->GetTriggerPercentage(),
-    {},
-    &Waypoint::GetTriggerPercentage
+        waypoints,
+        waypoint->GetTriggerPercentage(),
+        {},
+        &Waypoint::GetTriggerPercentage
     );
 
     waypoints.insert(pos, waypoint);
