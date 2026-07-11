@@ -16,19 +16,20 @@ namespace AutoPauseMod::DataManagement {
 namespace AutoPauseMod::Waypoints {
     enum class WaypointBehaviourType: uint8_t {
         FromStartPosOnly, //e.g. a waypoint of 53% and a startpos of 40%: would trigger at 93%
+        OnExactPercentage, //if you die exactly on a given percentage, no later, no earlier
         FromStartOnly,    //any percentage from 0. ignores start position
-        FromAnywhere      //if you pass a specific percentage in a level regardless of startpos
+        FromAnywhere,      //if you pass a specific percentage in a level regardless of startpos
     };
 
     inline WaypointBehaviourType GetNextWaypointType(const WaypointBehaviourType currentType) {
         return static_cast<WaypointBehaviourType>(
-            (static_cast<uint8_t>(currentType) + 1) % 3
+            (static_cast<uint8_t>(currentType) + 1) % 4
         );
     }
 
     inline WaypointBehaviourType GetPreviousWaypointType(const WaypointBehaviourType currentType) {
         return static_cast<WaypointBehaviourType>(
-            (static_cast<uint8_t>(currentType) + 2) % 3
+            (static_cast<uint8_t>(currentType) + 2) % 4
         );
     }
 
@@ -40,6 +41,8 @@ namespace AutoPauseMod::Waypoints {
                 return "STA";
             case WaypointBehaviourType::FromStartPosOnly:
                 return "SP";
+            case WaypointBehaviourType::OnExactPercentage:
+                return "ONP";
 
 
             default:

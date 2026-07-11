@@ -2,6 +2,7 @@
 // Created by katie on 22/06/2026.
 //
 
+#include <cmath>
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/PauseLayer.hpp>
@@ -76,12 +77,12 @@ class $modify(ModifiedPlayLayer, PlayLayer) {
             return PlayLayer::destroyPlayer(player, object);
 
         const int currentBest = this->m_level->getNormalPercent();
-        const float currentPercentage = this->getCurrentPercent();
+        const int currentPercentage = this->getCurrentPercentInt();
 
         PlayLayer::destroyPlayer(player, object);
 
         const bool isNewBest = DataManager->GetAttemptStartPercentage() <= 0.01f &&
-            (currentPercentage > currentBest) && !this->m_isPracticeMode;
+            currentPercentage >= 1.0f && (currentPercentage > currentBest) && !this->m_isPracticeMode;
 
         /*
          pause on either:
