@@ -568,14 +568,29 @@ void MainMenuPopup::onDeleteAllWaypointsButtonClicked(CCObject*) {
 }
 
 void MainMenuPopup::onInfoButtonClicked(CCObject*) {
+    //WARNING: eyesore ahead, horribly long string literal
+    //dont say i didnt warn you
+
     FLAlertLayer::create(
+        nullptr,
         "Waypoint Help",
 
-        "<cp>Global</c> - Waypoint functions across all levels"
-        "\n<cy>StartPos Only (SP)</c> - When you reach a certain percentage from your start position"
-        "\n<cy>Start Only (STA)</c> - When you reach a certain percentage from the start"
-        "\n<cy>Anywhere (ANY)</c> - Both",
 
-        "Ok"
+        "<cj>Waypoints</c> represent a point in the level where if you die, the game should pause. "
+        "Waypoints can be <cy>global</c>, meaning they work on any level, or <cy>level-specific</c>, "
+        "meaning they only work on a designated level. Waypoints are <cy>level-specific by default</c>, but can be toggled to global."
+        "\n\nWaypoints have four different modes:"
+        "\n<cc>From Start Only (STA)</c>, meaning it will only pause when you pass a specific percentage in the level from 0%."
+        "\n<cc>From StartPos Only (SP)</c>, meaning it will only pause when you pass a specific percentage relative to a StartPos."
+        "\n<cc>On Exact Percentage Only (ONP)</c>, meaning it will only pause when you die on an exact percentage."
+        "\n<cc>From Anywhere (ANY)</c>, meaning it will pause when any of the above cases are met.",
+
+
+        "OK",
+        nullptr,
+        510.0f,
+        false,
+        390.0f,
+        0.8f
     )->show();
 }
