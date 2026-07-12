@@ -66,8 +66,8 @@ void WaypointBehaviourSelector::setScale(float scale) {
     this->m_label->setScale(std::clamp(scale + 0.3f, 0.0f, 1.0f));
 }
 
-void WaypointBehaviourSelector::setCallback(const std::function<void(const Waypoints::WaypointBehaviourType)>& callback) {
-    this->m_callback = callback;
+void WaypointBehaviourSelector::setCallback(geode::Function<void(const Waypoints::WaypointBehaviourType)>&& callback) {
+    this->m_callback = std::move(callback);
 }
 
 void WaypointBehaviourSelector::setState(const Waypoints::WaypointBehaviourType newState) {

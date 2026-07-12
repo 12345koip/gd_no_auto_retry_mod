@@ -12,7 +12,7 @@ namespace AutoPauseMod::UI::Selectors {
             cocos2d::CCMenu* m_menu = nullptr;
             cocos2d::CCLabelBMFont* m_label = nullptr;
 
-            std::function<void(const Waypoints::WaypointBehaviourType)> m_callback = nullptr;
+            geode::Function<void(const Waypoints::WaypointBehaviourType)> m_callback = nullptr;
             Waypoints::WaypointBehaviourType m_index = Waypoints::WaypointBehaviourType::FromAnywhere;
 
             void onLeftButtonClicked(cocos2d::CCObject*);
@@ -35,7 +35,7 @@ namespace AutoPauseMod::UI::Selectors {
 
             void setState(const Waypoints::WaypointBehaviourType newState);
             void setScale(float scale) override;
-            void setCallback(const std::function<void(const Waypoints::WaypointBehaviourType)>& callback);
+            void setCallback(geode::Function<void(const Waypoints::WaypointBehaviourType)>&& callback);
             Waypoints::WaypointBehaviourType GetSelectedBehaviourType() const {return this->m_index;};
     };
 }

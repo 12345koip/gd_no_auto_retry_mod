@@ -52,7 +52,6 @@ WaypointList DataPersistence::LoadGlobalWaypoints() {
 void DataPersistence::SerialiseAndSaveWaypoints(const WaypointList& waypoints, int levelID, bool isEditorLevel) {
     const bool isGlobal = levelID == 0;
 
-
     std::string levelKey {};
     if (isGlobal)
         levelKey = "global";
