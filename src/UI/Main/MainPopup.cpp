@@ -1,8 +1,3 @@
-//
-// Created by katie on 26/06/2026.
-//
-
-#include <Geode/Geode.hpp>
 #include "MainPopup.hpp"
 #include "../../DataManagement/DataManager.hpp"
 #include "../Selectors/WaypointBehaviourSelector.hpp"
@@ -14,6 +9,8 @@ using namespace geode::prelude;
 #define GENERIC_WAYPOINT_ROW_NAME "WaypointRow"_spr
 #define GENERIC_WAYPOINT_ENABLED_TOGGLE_NAME "enabledToggler"_spr
 #define GENERIC_WAYPOINT_GLOBAL_TOGGLE_NAME "globalToggler"_spr
+#define MAIN_WAYPOINT_MENU_ID "MainMenuPopup"_spr
+
 
 static CCMenuItemToggler* makeToggle(MainMenuPopup* target, SEL_MenuHandler callback, float scale, const CCPoint& position, bool defaultState = false) {
     auto toggle = CCMenuItemToggler::createWithStandardSprites(target, callback, scale);
@@ -38,14 +35,16 @@ bool MainMenuPopup::init() {
         return false;
 
     this->setTitle("AutoPause On Death Configuration");
+    this->setID(MAIN_WAYPOINT_MENU_ID);
 
 
     auto* DataManager = DataManager::GetSingleton();
 
-    //--- toggles creation ---//
-    auto menu = CCMenu::create();
-    menu->setPosition(CCPointZero);
-    this->m_mainLayer->addChild(menu);
+    //"ignore practice mode" + "pause on new best" toggles.
+    auto toggleMenu = CCMenu::create();
+    toggleMenu->setPosition(CCPointZero);
+    this->m_mainLayer->addChild(toggleMenu);
+
 
     auto toggle_practiceMode = makeToggle(
         this,
@@ -54,7 +53,8 @@ bool MainMenuPopup::init() {
         {190.f, 195.f},
         DataManager->GetIgnorePracticeMode()
     );
-    menu->addChild(toggle_practiceMode);
+    toggleMenu->addChild(toggle_practiceMode);
+
 
     auto label_practiceMode = makeLabel(
         "Ignore practice mode",
@@ -74,7 +74,7 @@ bool MainMenuPopup::init() {
         DataManager->GetShouldPauseOnNewBest()
     );
 
-    menu->addChild(toggle_pauseOnNewBest);
+    toggleMenu->addChild(toggle_pauseOnNewBest);
 
     auto label_pauseOnNewBest = makeLabel(
         "Pause on new best",
@@ -86,14 +86,15 @@ bool MainMenuPopup::init() {
     this->m_mainLayer->addChild(label_pauseOnNewBest);
 
 
-    //--- scroller with waypoint toggles setup ---//
+
+
+
     auto scroller = ScrollLayer::create(
         {280.0f, 125.0f},
         true,
         true
     );
     this->m_scroller = scroller;
-
 
     scroller->m_bIgnoreAnchorPointForPosition = false;
     scroller->m_contentLayer->setLayout(
@@ -102,12 +103,17 @@ bool MainMenuPopup::init() {
 
     this->m_mainLayer->addChildAtPosition(scroller, Anchor::Center, {0.0f, -35.0f});
 
+
+    //scroller background
     auto bg = CCLayerColor::create({0, 0, 0, 90});
     bg->setContentSize({280.0f, 125.0f});
     bg->m_bIgnoreAnchorPointForPosition = false;
 
     this->m_mainLayer->addChildAtPosition(bg, Anchor::Center, {0.0f, -35.0f});
 
+
+
+    //scroller title
     auto label_waypoints = makeLabel(
         "Waypoints",
         "bigFont.fnt",
@@ -117,7 +123,6 @@ bool MainMenuPopup::init() {
     );
 
     this->m_mainLayer->addChild(label_waypoints);
-    //-----//
 
 
     //new waypoint button.
@@ -131,7 +136,7 @@ bool MainMenuPopup::init() {
     button_new->m_baseScale = 0.7f;
     button_new->setScale(0.7f);
     button_new->setPosition({33.0f, 143.0f});
-    menu->addChild(button_new);
+    toggleMenu->addChild(button_new);
 
     //information button.
     auto button_info = CCMenuItemSpriteExtra::create(
@@ -143,7 +148,7 @@ bool MainMenuPopup::init() {
     button_info->m_baseScale = 0.8f;
     button_info->setScale(0.8f);
     button_info->setPosition(353.0f, 143.0f);
-    menu->addChild(button_info);
+    toggleMenu->addChild(button_info);
 
     //delete all waypoints button.
     auto button_deleteAll = CCMenuItemSpriteExtra::create(
@@ -156,7 +161,7 @@ bool MainMenuPopup::init() {
     button_deleteAll->m_baseScale = 0.7f;
     button_deleteAll->setScale(0.7f);
     button_deleteAll->setPosition(33.0f, 115.0f);
-    menu->addChild(button_deleteAll);
+    toggleMenu->addChild(button_deleteAll);
 
 
     //disable all waypoints button.
@@ -170,7 +175,7 @@ bool MainMenuPopup::init() {
     button_disableAll->m_baseScale = 0.7f;
     button_disableAll->setScale(0.7f);
     button_disableAll->setPosition(33.0f, 82.0f);
-    menu->addChild(button_disableAll);
+    toggleMenu->addChild(button_disableAll);
 
     this->FlushAndRebuildList(
         DataManager->GetGlobalWaypoints(),
@@ -181,13 +186,14 @@ bool MainMenuPopup::init() {
 }
 
 CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoint>& waypoint) {
+    //top-level holder + background
     auto row = CCNode::create();
     row->setContentSize({270.0f, 34.0f});
     row->setLayoutOptions(
         AxisLayoutOptions::create()->setLength(34.0f)
     );
 
-    auto bg = CCLayerColor::create({255, 255, 255, 20});
+    auto bg = CCLayerColor::create({255, 255, 255, 0});
     bg->setContentSize(row->getContentSize());
     bg->m_bIgnoreAnchorPointForPosition = false;
     bg->setAnchorPoint({0.5f, 0.5f});
@@ -214,7 +220,10 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
         {53.0f, 17.0f},
         waypoint->IsGlobal()
     );
+
     toggle_global->setID(GENERIC_WAYPOINT_GLOBAL_TOGGLE_NAME);
+
+
 
     //"enabled" label + toggle
     auto label_enabled = makeLabel(
@@ -224,6 +233,7 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
         {57.0f, 17.0f},
         0.5f
     );
+
     label_enabled->setScale(0.4f);
     row->addChild(label_enabled);
 
@@ -234,6 +244,7 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
         {-15.0f, 17.0f},
         waypoint->IsEnabled()
     );
+
     toggle_enabled->setID(GENERIC_WAYPOINT_ENABLED_TOGGLE_NAME);
 
 
@@ -251,6 +262,7 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
     //percentage trigger input box + percentage label
     int currentPercent = PlayLayer::get()->getCurrentPercentInt();
     auto input = TextInput::create(55.0f, std::to_string(currentPercent));
+
     input->setPosition({22.0f, 17.0f});
     input->setScale(0.7f);
     input->setAnchorPoint({0.5f, 0.5f});
@@ -258,7 +270,10 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
         std::to_string(static_cast<int>(waypoint->GetTriggerPercentage())),
         false
     );
+
     row->addChild(input);
+
+
 
     auto label_percentage = makeLabel(
         "%",
@@ -268,6 +283,7 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
         0.4f
     );
     row->addChild(label_percentage);
+
 
     //delete button
     auto button_deleteWaypoint = CCMenuItemSpriteExtra::create(
@@ -283,6 +299,7 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
     toggleMenu->addChild(button_deleteWaypoint);
 
 
+
     //waypoint type toggle + label
     auto label_from = makeLabel(
         "From",
@@ -291,19 +308,19 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
         {222.0f, 28.0f},
         0.3f
     );
+
     row->addChild(label_from);
 
 
-    //selector.
-    auto selector = Selectors::WaypointBehaviourSelector::create();
-    selector->setPosition({222.0f, 13.0f});
-    selector->setScale(0.5f);
-    selector->setState(waypoint->GetBehaviourType());
-    row->addChild(selector);
+    auto behaviourSelector = Selectors::WaypointBehaviourSelector::create();
+    behaviourSelector->setPosition({222.0f, 13.0f});
+    behaviourSelector->setScale(0.5f);
+    behaviourSelector->setState(waypoint->GetBehaviourType());
+    row->addChild(behaviourSelector);
 
 
     //callbacks.
-    selector->setCallback(
+    behaviourSelector->setCallback(
         [weakWaypoint = std::weak_ptr(waypoint)](const Waypoints::WaypointBehaviourType newBehaviourType) -> void {
             if (weakWaypoint.expired()) {
                 log::debug("could not update behaviour type: waypoint expired.");
@@ -330,7 +347,8 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
             if (auto waypoint = weakWaypoint.lock()) {
                 waypoint->SetTriggerPercentage(newPercent);
                 DataManager::GetSingleton()->UpdateWaypointListPosition(waypoint);
-            } else log::warn("waypoint expired");
+            } else
+                log::warn("waypoint expired; could not update trigger percentage");
         }
     );
 
@@ -374,17 +392,16 @@ MainMenuPopup::~MainMenuPopup() {
 
 
 //listeners.
+
 void MainMenuPopup::onNewBestToggleClicked(CCObject* sender) {
-    auto toggle = typeinfo_cast<CCMenuItemToggler*>(sender);
-    if (!toggle) return;
+    auto toggle = static_cast<CCMenuItemToggler*>(sender);
 
     bool disabled = toggle->isToggled();
     DataManager::GetSingleton()->SetShouldPauseOnNewBest(!disabled);
 }
 
 void MainMenuPopup::onPracticeToggleClicked(CCObject* sender) {
-    auto toggle = typeinfo_cast<CCMenuItemToggler*>(sender);
-    if (!toggle) return;
+    auto toggle = static_cast<CCMenuItemToggler*>(sender);
 
     bool disabled = toggle->isToggled();
     DataManager::GetSingleton()->SetShouldIgnorePracticeMode(!disabled);
@@ -431,15 +448,12 @@ CCNode* MainMenuPopup::ResolveWaypointUIRoot(CCNode* current) {
 void MainMenuPopup::onRowGlobalToggleClicked(CCObject* sender) {
     auto* node = static_cast<CCNode*>(sender);
 
-    //we want the root row for this waypoint.
     CCNode* row = this->ResolveWaypointUIRoot(node);
-
     if (!row) {
         log::warn("could not find waypoint root CCNode");
         return;
     }
 
-    //resolve associated waypoint.
     auto weak = this->GetAssociatedWaypoint(row);
     auto waypoint = weak? weak->lock(): nullptr;
 
@@ -455,15 +469,12 @@ void MainMenuPopup::onRowGlobalToggleClicked(CCObject* sender) {
 void MainMenuPopup::onRowEnabledToggleClicked(CCObject* sender) {
     auto* node = static_cast<CCNode*>(sender);
 
-    //root.
     CCNode* row = this->ResolveWaypointUIRoot(node);
-
     if (!row) {
         log::warn("could not find waypoint root CCNode");
         return;
     }
 
-    //resolve associated waypoint.
     auto weak = this->GetAssociatedWaypoint(row);
     auto waypoint = weak? weak->lock(): nullptr;
 
@@ -472,11 +483,12 @@ void MainMenuPopup::onRowEnabledToggleClicked(CCObject* sender) {
         return;
     }
 
-    //get + update "enabled" toggle.
+
     auto toggler = static_cast<CCMenuItemToggler*>(row->getChildByIDRecursive(GENERIC_WAYPOINT_ENABLED_TOGGLE_NAME));
     bool enabled = !toggler->m_toggled;
     log::debug("toggled: {}", enabled);
     waypoint->SetEnabled(enabled);
+
 
     if (waypoint->IsGlobal())
         DataManager::GetSingleton()->SaveGlobalWaypointInformation();
@@ -487,15 +499,12 @@ void MainMenuPopup::onRowEnabledToggleClicked(CCObject* sender) {
 void MainMenuPopup::onRowDeleteButtonClicked(CCObject* sender) {
     auto* node = static_cast<CCNode*>(sender);
 
-    //root
     CCNode* row = this->ResolveWaypointUIRoot(node);
-
     if (!row) {
         log::warn("could not find waypoint root CCNode");
         return;
     }
 
-    //waypoint
     auto weak = this->GetAssociatedWaypoint(row);
     auto waypoint = weak? weak->lock(): nullptr;
 
@@ -508,9 +517,9 @@ void MainMenuPopup::onRowDeleteButtonClicked(CCObject* sender) {
     geode::createQuickPopup(
         "Confirm",
         "Would you like to delete this waypoint? <cy>This cannot be undone!</c>",
-        "Yes", "No",
-        [this, row, waypoint](auto, bool didClickNo) -> void {
-            if (didClickNo) return;
+        "No", "Yes",
+        [this, row, waypoint](auto, bool didClickYes) -> void {
+            if (!didClickYes) return;
 
             DataManager::GetSingleton()->DeleteWaypoint(waypoint);
             row->removeFromParent();
@@ -529,9 +538,9 @@ void MainMenuPopup::onDisableAllWaypointsButtonClicked(CCObject*) {
     geode::createQuickPopup(
         "Confirm",
         "Are you sure you want to disable <cy>all waypoints</c>?",
-        "Yes", "No",
-        [this](auto, bool didClickNo) -> void {
-            if (didClickNo) return;
+        "No", "Yes",
+        [this](auto, bool didClickYes) -> void {
+            if (!didClickYes) return;
 
             for (const auto& [ui, weakWaypoint]: this->m_waypointUIMap) {
                 if (auto waypoint = weakWaypoint.lock()) {
@@ -553,9 +562,9 @@ void MainMenuPopup::onDeleteAllWaypointsButtonClicked(CCObject*) {
     geode::createQuickPopup(
         "Confirm",
         "Are you sure you want to delete <cy>all waypoints</c>? <cy>This cannot be undone!</c>",
-        "Yes", "No",
-        [this](auto, bool didClickNo) -> void {
-            if (didClickNo) return;
+        "No", "Yes",
+        [this](auto, bool didClickYes) -> void {
+            if (!didClickYes) return;
             DataManager::GetSingleton()->DeleteAllWaypoints();
 
             for (const auto& [ui, _wp]: this->m_waypointUIMap)

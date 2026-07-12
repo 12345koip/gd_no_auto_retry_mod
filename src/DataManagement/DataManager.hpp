@@ -1,12 +1,5 @@
-//
-// Created by katie on 22/06/2026.
-//
-
 #pragma once
 #include <Geode/Geode.hpp>
-#include <memory>
-#include <vector>
-#include <mutex>
 #include "../Waypoints/Definitions.hpp"
 #include "DataPersistence/Managers.hpp"
 
@@ -17,13 +10,10 @@ namespace AutoPauseMod::UI::Main {
 namespace AutoPauseMod::DataManagement {
     class DataManager final {
         private:
-
-            //this is just an observer pointer bc the user
-            //might open it multiple times on one pause
-            //and idk the adding of nodes each time might be expensive
+            //NOTE: this is just an observer, main popup destructor handles removing it
             UI::Main::MainMenuPopup* m_menuPopup = nullptr;
 
-            //NOTE: these two waypoint lists should always be in a sorted state
+            //these two will always be sorted
             DataPersistence::WaypointList m_loadedLevelWaypoints {};
             DataPersistence::WaypointList m_loadedGlobalWaypoints {};
 
@@ -34,12 +24,8 @@ namespace AutoPauseMod::DataManagement {
             bool m_bPauseOnNewBest = true;
             bool m_bIgnorePracticeMode = true;
 
-            //this will be set true for any level type that is not supported,
-            //such as an editor playtest or platformer mode. Just means we'll
-            //ignore all events
+            //true for any unsupported level type
             bool m_bIgnoreState = false;
-
-            std::mutex m_waypointSaveLoadOperationMutex {};
 
 
             void RefreshWaypoints(); //will be called after a new level is entered.
@@ -51,7 +37,7 @@ namespace AutoPauseMod::DataManagement {
             DataManager();
             ~DataManager() = default;
 
-            friend class AutoPauseMod::UI::Main::MainMenuPopup;
+            friend class UI::Main::MainMenuPopup;
 
         public:
             static DataManager* GetSingleton() {
@@ -62,35 +48,31 @@ namespace AutoPauseMod::DataManagement {
             void UpdateWaypointListPosition(const std::shared_ptr<Waypoints::Waypoint>& waypoint);
             void DeleteAllWaypoints();
 
-            [[nodiscard]] bool GetIgnoreState() const {return this->m_bIgnoreState;}
-            [[nodiscard]] int GetCurrentStoredLevelID() const {return this->m_currentLevelID;}
+            bool GetIgnoreState() const {return this->m_bIgnoreState;}
+            int GetCurrentStoredLevelID() const {return this->m_currentLevelID;}
 
             void ToggleWaypoint(const std::shared_ptr<Waypoints::Waypoint>& waypoint);
             void DeleteWaypoint(const std::shared_ptr<Waypoints::Waypoint>& waypoint);
 
-            [[nodiscard]] bool GetShouldPauseOnNewBest() const {return this->m_bPauseOnNewBest;}
-            [[nodiscard]] bool GetIgnorePracticeMode() const {return this->m_bIgnorePracticeMode;}
+            bool GetShouldPauseOnNewBest() const {return this->m_bPauseOnNewBest;}
+            bool GetIgnorePracticeMode() const {return this->m_bIgnorePracticeMode;}
 
-            //performs a check on death to see if any waypoints cause for a pause
-            bool CheckWaypoints(const float currentPercentage) const;
-
-            //the default state for a waypoint is always going to be level-specific.
-            //the user can toggle it to be global afterwards if they want.
+            bool CheckShouldPauseOnDeath(const float currentPercentage) const;
             std::shared_ptr<Waypoints::Waypoint> NewWaypoint();
 
             void UpdateForLevelInformation(GJGameLevel* level);
             void SaveLevelWaypointInformation();
-            void SaveGlobalWaypointInformation();
+            void SaveGlobalWaypointInformation() const;
 
-            [[nodiscard]] float GetAttemptStartPercentage() const {return this->m_attemptStartPercent;}
+            float GetAttemptStartPercentage() const {return this->m_attemptStartPercent;}
             void SetAttemptStartPercentage(float percentage);
 
             void ShowMenuPopup() const;
 
             void UpdateMenuPopupPointer(UI::Main::MainMenuPopup* newPointer);
-            [[nodiscard]] UI::Main::MainMenuPopup* GetMenuPopup() const {return this->m_menuPopup;}
+            UI::Main::MainMenuPopup* GetMenuPopup() const {return this->m_menuPopup;}
 
-            [[nodiscard]] DataPersistence::WaypointList GetLevelWaypoints() const {return this->m_loadedLevelWaypoints;}
-            [[nodiscard]] DataPersistence::WaypointList GetGlobalWaypoints() const {return this->m_loadedGlobalWaypoints;}
+            DataPersistence::WaypointList GetLevelWaypoints() const {return this->m_loadedLevelWaypoints;}
+            DataPersistence::WaypointList GetGlobalWaypoints() const {return this->m_loadedGlobalWaypoints;}
     };
 }

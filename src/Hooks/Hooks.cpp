@@ -1,8 +1,3 @@
-//
-// Created by katie on 22/06/2026.
-//
-
-#include <cmath>
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/PauseLayer.hpp>
@@ -89,7 +84,7 @@ class $modify(ModifiedPlayLayer, PlayLayer) {
          new best AND "pause on new best" setting is enabled,
          OR any enabled waypoint signals a pause
         */
-        if (isNewBest && DataManager->GetShouldPauseOnNewBest() || DataManager->CheckWaypoints(currentPercentage))
+        if (isNewBest && DataManager->GetShouldPauseOnNewBest() || DataManager->CheckShouldPauseOnDeath(currentPercentage))
             g_doPauseResetSequence = true;
     }
 };

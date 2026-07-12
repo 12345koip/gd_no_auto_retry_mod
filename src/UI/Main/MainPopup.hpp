@@ -1,14 +1,7 @@
-//
-// Created by katie on 26/06/2026.
-//
-
 #pragma once
 
 #include <Geode/Geode.hpp>
 #include <Geode/ui/Popup.hpp>
-#include <unordered_map>
-#include <optional>
-
 #include "../../DataManagement/DataPersistence/Managers.hpp"
 
 namespace AutoPauseMod::Waypoints {
@@ -24,9 +17,7 @@ namespace AutoPauseMod::UI::Main {
             std::unordered_map<CCNode*, std::weak_ptr<Waypoints::Waypoint>> m_waypointUIMap {};
             geode::ScrollLayer* m_scroller = nullptr;
 
-            //TODO: add hooks to listen for exiting a level, and have the UI discarded then.
-
-            [[nodiscard]] CCNode* makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoint>& waypoint);
+            CCNode* makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoint>& waypoint);
 
         public:
             static MainMenuPopup* create() {
@@ -43,6 +34,7 @@ namespace AutoPauseMod::UI::Main {
 
             void FlushAndRebuildList(const DataManagement::DataPersistence::WaypointList& globalWaypoints, const DataManagement::DataPersistence::WaypointList& levelWaypoints);
 
+            //talk about a lot of listeners...
             void onPracticeToggleClicked(CCObject* sender);
             void onNewBestToggleClicked(CCObject* sender);
             void onNewWaypointButtonClicked(CCObject*);
@@ -53,7 +45,8 @@ namespace AutoPauseMod::UI::Main {
             void onDisableAllWaypointsButtonClicked(CCObject*);
             void onInfoButtonClicked(CCObject*);
 
-            [[nodiscard]] CCNode* GetWaypointUI(const Waypoints::Waypoint* waypoint) const;
+
+            CCNode* GetWaypointUI(const Waypoints::Waypoint* waypoint) const;
             std::optional<std::weak_ptr<Waypoints::Waypoint>> GetAssociatedWaypoint(CCNode* ui) const;
             CCNode* ResolveWaypointUIRoot(CCNode* current);
 
