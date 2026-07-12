@@ -4,10 +4,10 @@
 		"win": "2.2081",
 		"android": "2.2081"
 	},
-	"id": "kxtie_gd.auto-pause-on-death",
+	"id": "kx_.auto-pause-on-death",
 	"name": "Auto Pause On Death",
 	"version": "v1.0.0",
-	"developer": "kxtie_gd",
+	"developer": "kx_",
 	"description": "",
 	"dependencies": {
 		"geode.node-ids": ">=v1.23.3",
