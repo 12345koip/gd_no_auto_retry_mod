@@ -57,12 +57,8 @@ namespace AutoPauseMod::Waypoints {
             bool m_bEnabled;
             bool m_bIsGlobal;
 
-        public:
-            ~Waypoint() = default;
-            Waypoint(const Waypoint&) = delete;
-            Waypoint& operator=(const Waypoint&) = delete;
-            Waypoint(Waypoint&&) = delete;
 
+        public:
             explicit Waypoint(WaypointBehaviourType type, float percentage = 0, int levelID = 0):
                    m_behaviourType(type), m_activationPercentage(percentage), m_bEnabled(true), m_bIsGlobal(false), m_levelID(levelID) {};
 

@@ -1,10 +1,4 @@
-//
-// Created by katie on 04/07/2026.
-//
-
 #include "WaypointBehaviourSelector.hpp"
-#include <Geode/Geode.hpp>
-#include <algorithm>
 
 using namespace geode::prelude;
 using namespace AutoPauseMod::UI::Selectors;
