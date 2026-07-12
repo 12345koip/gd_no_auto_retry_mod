@@ -193,7 +193,7 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
         AxisLayoutOptions::create()->setLength(34.0f)
     );
 
-    auto bg = CCLayerColor::create({255, 255, 255, 0});
+    auto bg = CCLayerColor::create({194, 115, 0, 255});
     bg->setContentSize(row->getContentSize());
     bg->m_bIgnoreAnchorPointForPosition = false;
     bg->setAnchorPoint({0.5f, 0.5f});
@@ -270,6 +270,7 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
         std::to_string(static_cast<int>(waypoint->GetTriggerPercentage())),
         false
     );
+    input->setFilter("0123456789");
 
     row->addChild(input);
 
@@ -339,23 +340,26 @@ CCNode* MainMenuPopup::makeUIForWaypoint(const std::shared_ptr<Waypoints::Waypoi
     );
 
     input->setCallback(
-        [weakWaypoint = std::weak_ptr(waypoint)](const std::string& newContents) -> void {
-            auto result = geode::utils::numFromString<int>(newContents, 10);
-            int newInput = result? result.unwrap(): 0;
-            int newPercent = std::clamp(newInput, 0, 100);
+        [input, weakWaypoint = std::weak_ptr(waypoint)](const std::string& newText) {
+            auto result = geode::utils::numFromString<int>(newText, 10);
+            int clampedValue = result? result.unwrap(): 0;
+            clampedValue = std::clamp(clampedValue, 0, 100);
+
+            //input text was out of range or else invalid, update input box with safeguard value
+            if (auto valueStr = std::to_string(clampedValue); newText != valueStr)
+                input->setString(valueStr, false);
+
 
             if (auto waypoint = weakWaypoint.lock()) {
-                waypoint->SetTriggerPercentage(newPercent);
+                waypoint->SetTriggerPercentage(clampedValue);
                 DataManager::GetSingleton()->UpdateWaypointListPosition(waypoint);
-            } else
-                log::warn("waypoint expired; could not update trigger percentage");
+            }
         }
     );
 
     row->setID(GENERIC_WAYPOINT_ROW_NAME);
 
 
-    //show it.
     this->m_scroller->m_contentLayer->addChild(row);
     this->m_scroller->m_contentLayer->updateLayout();
     this->m_scroller->scrollToTop();
@@ -586,20 +590,17 @@ void MainMenuPopup::onInfoButtonClicked(CCObject*) {
 
 
         "<cj>Waypoints</c> represent a point in the level where if you die, the game should pause. "
-        "Waypoints can be <cy>global</c>, meaning they work on any level, or <cy>level-specific</c>, "
-        "meaning they only work on a designated level. Waypoints are <cy>level-specific by default</c>, but can be toggled to global."
-        "\n\nWaypoints have four different modes:"
-        "\n<cc>From Start Only (STA)</c>, meaning it will only pause when you pass a specific percentage in the level from 0%."
-        "\n<cc>From StartPos Only (SP)</c>, meaning it will only pause when you pass a specific percentage relative to a StartPos."
-        "\n<cc>On Exact Percentage Only (ONP)</c>, meaning it will only pause when you die on an exact percentage."
-        "\n<cc>From Anywhere (ANY)</c>, meaning it will pause when any of the above cases are met.",
+        "Waypoints can be <cy>global</c>, or <cy>level-specific</c>, and are level-specific by default."
+        "\n\nWaypoints have four different modes, being "
+        "<cc>From Start Only (STA), From StartPos Only (SP), On Exact Percentage Only (ONP), and From Anywhere (ANY)</c>."
+        "\n\nSee this mod's <cj>About</c> section in the <cy>Geode</c> menu for more information!",
 
 
         "OK",
         nullptr,
-        510.0f,
+        350.0f,
         false,
-        390.0f,
-        0.8f
+        135.0f,
+        0.7f
     )->show();
 }

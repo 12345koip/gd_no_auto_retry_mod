@@ -1,10 +1,5 @@
-//
-// Created by katie on 04/07/2026.
-//
-
 #pragma once
 #include "../../Waypoints/Definitions.hpp"
-#include <functional>
 
 namespace AutoPauseMod::UI::Selectors {
     class WaypointBehaviourSelector final: public cocos2d::CCNode {
