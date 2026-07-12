@@ -1,8 +1,3 @@
-//
-// Created by katie on 23/06/2026.
-//
-
-#include <Geode/Geode.hpp>
 #include <cvolton.level-id-api/include/EditorIDs.hpp>
 #include "DataManager.hpp"
 #include "../UI/Main/MainPopup.hpp"
@@ -12,9 +7,7 @@ using namespace AutoPauseMod::Waypoints;
 using namespace geode::prelude;
 
 
-
 std::shared_ptr<Waypoint> DataManager::NewWaypoint() {
-    //PlayLayer's always gonna exist so long as the UI is open.
     float percentage = PlayLayer::get()->getCurrentPercent();
 
     auto waypoint = std::make_shared<Waypoint>(
@@ -37,67 +30,46 @@ std::shared_ptr<Waypoint> DataManager::NewWaypoint() {
 }
 
 void DataManager::ToggleWaypoint(const std::shared_ptr<Waypoint>& waypoint) {
-    if (!waypoint->IsGlobal()) {
-        const auto it = std::ranges::find(this->m_loadedLevelWaypoints, waypoint);
-        if (it == this->m_loadedLevelWaypoints.end()) {
-            log::warn("waypoint not found in level waypoint list when global toggling");
-            return;
-        }
+    const bool wasGlobal = waypoint->IsGlobal();
+    auto& from = wasGlobal? this->m_loadedGlobalWaypoints: this->m_loadedLevelWaypoints;
+    auto& to = wasGlobal? this->m_loadedLevelWaypoints: this->m_loadedGlobalWaypoints;
 
-        this->m_loadedLevelWaypoints.erase(it);
-
-        waypoint->SetGlobal(true);
-
-        const auto pos = std::ranges::lower_bound(
-            this->m_loadedGlobalWaypoints,
-            waypoint->GetTriggerPercentage(),
-            std::ranges::less{},
-            &Waypoint::GetTriggerPercentage
-        );
-
-        this->m_loadedGlobalWaypoints.insert(pos, waypoint);
+    const auto it = std::ranges::find(from, waypoint);
+    if (it == from.end()) {
+        log::warn("waypoint not found in {} list when toggling", wasGlobal? "global": "level");
+        return;
     }
 
-    else {
-        const auto it = std::ranges::find(this->m_loadedGlobalWaypoints, waypoint);
-        if (it == this->m_loadedGlobalWaypoints.end()) {
-            log::warn("waypoint not found in global waypoint list when global toggling");
-            return;
-        }
+    from.erase(it);
+    waypoint->SetGlobal(!wasGlobal);
 
-        this->m_loadedGlobalWaypoints.erase(it);
-
-        waypoint->SetGlobal(false);
+    if (wasGlobal)
         waypoint->SetLevelID(this->m_currentLevelID);
 
-        const auto pos = std::ranges::lower_bound(
-            this->m_loadedLevelWaypoints,
-            waypoint->GetTriggerPercentage(),
-            std::ranges::less{},
-            &Waypoint::GetTriggerPercentage
-        );
-
-        this->m_loadedLevelWaypoints.insert(pos, waypoint);
-    }
+    const auto insertPos = std::ranges::lower_bound(
+        to,
+        waypoint->GetTriggerPercentage(),
+        std::ranges::less{},
+        &Waypoint::GetTriggerPercentage
+    );
+    to.insert(insertPos, waypoint);
 
     this->SaveGlobalWaypointInformation();
     this->SaveLevelWaypointInformation();
 }
 
 void DataManager::DeleteWaypoint(const std::shared_ptr<Waypoint>& waypoint) {
-    if (waypoint->IsGlobal()) {
-        auto it = std::ranges::find(this->m_loadedGlobalWaypoints, waypoint);
-        if (it != this->m_loadedGlobalWaypoints.end()) this->m_loadedGlobalWaypoints.erase(it);
+    auto& waypointList = waypoint->IsGlobal()? this->m_loadedGlobalWaypoints: this->m_loadedLevelWaypoints;
 
+    const auto it = std::ranges::find(waypointList, waypoint);
+    if (it != waypointList.end())
+        waypointList.erase(it);
+
+
+    if (waypoint->IsGlobal())
         this->SaveGlobalWaypointInformation();
-    }
-
-    else {
-        auto it = std::ranges::find(this->m_loadedLevelWaypoints, waypoint);
-        if (it != this->m_loadedLevelWaypoints.end()) this->m_loadedLevelWaypoints.erase(it);
-
+    else
         this->SaveLevelWaypointInformation();
-    }
 }
 
 void DataManager::SetShouldPauseOnNewBest(bool newState) {
@@ -131,16 +103,13 @@ void DataManager::SetShouldIgnorePracticeMode(bool newState) {
     Mod::get()->setSavedValue<bool>("ignorePracticeMode", newState);
 }
 
-void DataManager::SaveGlobalWaypointInformation() {
-    std::lock_guard lock (this->m_waypointSaveLoadOperationMutex);
-
+void DataManager::SaveGlobalWaypointInformation() const {
     DataPersistence::SerialiseAndSaveWaypoints(this->m_loadedGlobalWaypoints);
     log::debug("saved {} global waypoints", this->m_loadedGlobalWaypoints.size());
 }
 
 void DataManager::SaveLevelWaypointInformation() {
     if (this->m_currentLevelID == 0 && !this->m_bIsEditorLevel) return;
-    std::lock_guard lock (this->m_waypointSaveLoadOperationMutex);
 
     DataPersistence::SerialiseAndSaveWaypoints(this->m_loadedLevelWaypoints, this->m_currentLevelID, this->m_bIsEditorLevel);
     log::debug("save request for level {} isEditorLevel: {}", this->m_currentLevelID, this->m_bIsEditorLevel);
@@ -148,8 +117,6 @@ void DataManager::SaveLevelWaypointInformation() {
 }
 
 void DataManager::UpdateForLevelInformation(GJGameLevel* level) {
-    std::lock_guard lock (this->m_waypointSaveLoadOperationMutex);
-
     if (!level || level->isPlatformer() || LevelEditorLayer::get()) {
         this->m_bIgnoreState = true;
         this->m_currentLevelID = 0;
@@ -157,15 +124,18 @@ void DataManager::UpdateForLevelInformation(GJGameLevel* level) {
         return;
     } else this->m_bIgnoreState = false;
 
+
     if (level->m_levelType == GJLevelType::Editor) { //only playtesting is supported for editor levels.
         this->m_currentLevelID = EditorIDs::getID(level);
         this->m_bIsEditorLevel = true;
         log::debug("entered level is editor level; editor level ID: {}", this->m_currentLevelID);
+
     } else {
         this->m_currentLevelID = level->m_levelID.value();
         this->m_bIsEditorLevel = false;
         log::debug("entered level is not an editor level; level ID: {}", this->m_currentLevelID);
     }
+
 
     //load waypoints.
     this->m_loadedLevelWaypoints = DataPersistence::LoadLevelWaypoints(this->m_currentLevelID, this->m_bIsEditorLevel);
@@ -174,7 +144,7 @@ void DataManager::UpdateForLevelInformation(GJGameLevel* level) {
     this->DiscardPopup();
 }
 
-bool DataManager::CheckWaypoints(const float currentPercentage) const {
+bool DataManager::CheckShouldPauseOnDeath(const float currentPercentage) const {
     const auto shouldPause = [&](const std::shared_ptr<Waypoint>& waypoint) -> bool {
         return waypoint->ShouldPause(this, currentPercentage);
     };
@@ -208,8 +178,6 @@ void DataManager::UpdateWaypointListPosition(const std::shared_ptr<Waypoints::Wa
         this->SaveLevelWaypointInformation();
 }
 
-//gonna do some textbook RAII bc uhh its cool :3
-//okay but realistically its actually useful
 DataManager::DataManager() {
     this->m_loadedGlobalWaypoints = DataPersistence::LoadGlobalWaypoints();
     this->m_bPauseOnNewBest = Mod::get()->getSavedValue<bool>("pauseOnNewBest", true);
