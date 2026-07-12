@@ -14,5 +14,8 @@ Waypoints can either be **global** or **level-specific**. A global waypoint mean
 ## Editing Waypoints
 Waypoints can be created, edited and configured to your liking through the **pause menu**. Click the "AutoPause" button to bring up the UI.
 
-## Issues and bugs
+## Why not just use the Auto Retry setting?
+Auto Pause On Death aims to provide fine-tuned control to only pause under specific circumstances instead of on every attempt. Bringing up the pause menu instead of the auto retry menu also allows you to use other tools to inspect your death, as many of these tools do not work with the auto retry menu.
+
+## Bug Reporting
 If you find any bugs using this mod, please open up an Issue on the GitHub repository to report it!
