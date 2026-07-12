@@ -1,5 +1,5 @@
 # About
-**Auto Pause On Death** is a mod which allows you to control when the game should pause if you die while playing on a level.
+**Auto Pause On Death** is a mod which allows you to control when the game should pause if you die while playing a level.
 
 # Waypoints
 A **waypoint** represents a certain point in the level where dying should pause the game.
