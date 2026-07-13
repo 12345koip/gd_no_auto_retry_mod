@@ -8,19 +8,13 @@ using namespace AutoPauseMod::UI::WaypointUI;
 using namespace AutoPauseMod::DataManagement;
 using namespace geode::prelude;
 
-#define GENERIC_WAYPOINT_ROW_NAME "WaypointRow"_spr
-#define GENERIC_WAYPOINT_ENABLED_TOGGLE_NAME "enabledToggler"_spr
-#define GENERIC_WAYPOINT_GLOBAL_TOGGLE_NAME "globalToggler"_spr
-#define MAIN_WAYPOINT_MENU_NAME "MainMenuPopup"_spr
-#define WAYPOINT_ROW_TOGGLE_MENU_NAME "ToggleMenu"_spr
-
 
 bool MainMenuPopup::init() {
     if (!Popup::init(400.f, 250.f))
         return false;
 
     this->setTitle("AutoPause On Death Configuration");
-    this->setID(MAIN_WAYPOINT_MENU_NAME);
+    this->setID("MainMenuPopup"_spr);
 
 
     auto* DataManager = DataManager::GetSingleton();
@@ -234,7 +228,7 @@ void MainMenuPopup::onDisableAllWaypointsButtonClicked(CCObject*) {
             auto scroller = this->m_scroller.lock();
 
             for (auto* row: scroller->m_contentLayer->getChildrenExt<WaypointRow>())
-                row->SetEnabled(false);
+                row->setEnabled(false);
 
             auto* DataManager = DataManager::GetSingleton();
             DataManager->SaveGlobalWaypointInformation();

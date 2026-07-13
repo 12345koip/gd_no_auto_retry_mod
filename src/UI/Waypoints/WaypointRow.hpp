@@ -37,7 +37,7 @@ namespace AutoPauseMod::UI::WaypointUI {
                 return this->m_associatedWaypoint.lock();
             }
 
-            void SetEnabled(bool newEnabled);
+            void setEnabled(bool newEnabled);
             void Delete(bool alsoDeleteWaypoint = false);
     };
 }
