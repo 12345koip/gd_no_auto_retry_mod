@@ -109,6 +109,15 @@ bool WaypointRow::init(const std::shared_ptr<Waypoints::Waypoint>& waypoint, con
     );
     this->addChild(m_pTextInputBox);
 
+    auto label_percentage = Utils::MakeLabel(
+        "%",
+        "bigFont.fnt",
+        {0.0f, 0.5f},
+        {42.0f, 17.0f},
+        0.4f
+    );
+    this->addChild(label_percentage);
+
 
     //behaviour
     auto selector = Selectors::WaypointBehaviourSelector::create();
