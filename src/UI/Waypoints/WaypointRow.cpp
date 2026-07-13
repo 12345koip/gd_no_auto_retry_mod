@@ -7,13 +7,15 @@ using namespace AutoPauseMod::DataManagement;
 using namespace AutoPauseMod::UI::WaypointUI;
 using namespace geode::prelude;
 
-
-bool WaypointRow::init(const std::shared_ptr<Waypoints::Waypoint>& waypoint, const geode::WeakRef<ScrollLayer>& scroller) {
+//...
+//ok thats a long signature lets never do that again
+bool WaypointRow::init(const std::shared_ptr<Waypoints::Waypoint>& waypoint, const geode::WeakRef<ScrollLayer>& scroller, const geode::WeakRef<Main::MainMenuPopup>& mainPopup) {
     if (!CCNode::init())
         return false;
 
     this->m_associatedWaypoint = waypoint;
     this->m_ownerWaypointScroller = scroller;
+    this->m_ownerPopup = mainPopup;
 
     //root row
     this->setContentSize({270.0f, 34.0f});
@@ -202,11 +204,6 @@ void WaypointRow::onDeleteButtonClicked(CCObject*) {
             auto scroller = this->m_ownerWaypointScroller.lock();
 
             this->Delete(true);
-
-            if (scroller) {
-                scroller->m_contentLayer->updateLayout();
-                scroller->scrollToTop();
-            }
         }
     );
 }

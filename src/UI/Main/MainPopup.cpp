@@ -156,10 +156,7 @@ bool MainMenuPopup::init() {
     button_disableAll->setPosition(33.0f, 82.0f);
     toggleMenu->addChild(button_disableAll);
 
-    this->RebuildWaypointList(
-        DataManager->GetGlobalWaypoints(),
-        DataManager->GetLevelWaypoints()
-    );
+    this->RebuildWaypointList();
 
     return true;
 }
@@ -184,10 +181,12 @@ void MainMenuPopup::onPracticeToggleClicked(CCObject* sender) {
     DataManager::GetSingleton()->SetShouldIgnorePracticeMode(!disabled);
 }
 
+
+//not gonna flush and rebuild, see below :3
 void MainMenuPopup::onNewWaypointButtonClicked(CCObject*) {
     if (auto scroller = this->m_scroller.lock()) {
         auto waypoint = DataManager::GetSingleton()->NewWaypoint();
-        auto row = WaypointRow::create(waypoint, this->m_scroller);
+        auto row = WaypointRow::create(waypoint, this->m_scroller, this);
 
         scroller->m_contentLayer->addChild(row);
         scroller->m_contentLayer->updateLayout();
@@ -195,21 +194,30 @@ void MainMenuPopup::onNewWaypointButtonClicked(CCObject*) {
     }
 }
 
-void MainMenuPopup::RebuildWaypointList(const DataPersistence::WaypointList& globalWaypoints, const DataPersistence::WaypointList& levelWaypoints) {
+//no nice way to keep an order in the scroller, so when a waypoint's percentage changes,
+//etc. we're just going to do nothing. might also make it easier for the user to track
+//their changes. it's not a horrible trade-off and would be painful to implement
+//so theyll just see it when they next open the menu
+void MainMenuPopup::RebuildWaypointList() {
     auto scroller = this->m_scroller.lock();
     if (!scroller) return;
+
+    auto* dataManager = DataManager::GetSingleton();
+    const auto& levelWaypoints = dataManager->GetLevelWaypoints();
+    const auto& globalWaypoints = dataManager->GetGlobalWaypoints();
+
 
     for (auto* row: scroller->m_contentLayer->getChildrenExt<WaypointRow>())
         row->Delete(false);
 
     for (const auto& waypoint: globalWaypoints) {
-        auto row = WaypointRow::create(waypoint, this->m_scroller);
+        auto row = WaypointRow::create(waypoint, this->m_scroller, this);
         scroller->m_contentLayer->addChild(row);
         scroller->m_contentLayer->updateLayout();
     }
 
     for (const auto& waypoint: levelWaypoints) {
-        auto row = WaypointRow::create(waypoint, this->m_scroller);
+        auto row = WaypointRow::create(waypoint, this->m_scroller, this);
         scroller->m_contentLayer->addChild(row);
         scroller->m_contentLayer->updateLayout();
     }
@@ -258,16 +266,13 @@ void MainMenuPopup::onDeleteAllWaypointsButtonClicked(CCObject*) {
 }
 
 void MainMenuPopup::onInfoButtonClicked(CCObject*) {
-    //WARNING: eyesore ahead, horribly long string literal
-    //dont say i didnt warn you
+    //warning: still kind of ugly string literal(s)
 
     FLAlertLayer::create(
         nullptr,
         "Waypoint Help",
 
-
-        "<cj>Waypoints</c> represent a point in the level where if you die, the game should pause. "
-        "Waypoints can be <cy>global</c>, or <cy>level-specific</c>, and are level-specific by default."
+        "Waypoints can be <cy>global</c>, or <cy>level-specific</c> (default)."
         "\n\nWaypoints have four different modes, being "
         "<cc>From Start Only (STA), From StartPos Only (SP), On Exact Percentage Only (ONP), and From Anywhere (ANY)</c>."
         "\n\nSee this mod's <cj>About</c> section in the <cy>Geode</c> menu for more information!",

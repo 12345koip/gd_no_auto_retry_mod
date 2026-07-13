@@ -17,7 +17,7 @@ Waypoints can be created, edited and configured to your liking through the **pau
 ## Why not just use the Auto Retry setting?
 Auto Pause On Death aims to provide fine-tuned control to only pause under specific circumstances instead of on every attempt. Bringing up the pause menu instead of the auto retry menu also allows you to use other third-party tools (**none are included with this mod**) to inspect your death, as many of these tools do not work with the auto retry menu.
 
-If you want to inspect your deaths when you're far into a level, and simply can't for whatever reason (can't react quick enough to the death, or focusing on that too is too distracting, etc.) then this is the mod for you!
+If you want to inspect your deaths when you're far into a level, and can't pause for whatever reason (e.g. if you can't react quick enough to the death, or focusing on that too is too distracting) then this is the mod for you!
 
 ## Bug Reporting
 If you find any bugs using this mod, please open up an Issue on the GitHub repository to report it!
