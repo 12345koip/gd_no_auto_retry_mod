@@ -2,6 +2,7 @@
 #include <Geode/Geode.hpp>
 #include "../Waypoints/Definitions.hpp"
 #include "DataPersistence/Managers.hpp"
+#include "../UI/Main/MainPopup.hpp"
 
 namespace AutoPauseMod::UI::Main {
     class MainMenuPopup;
@@ -10,8 +11,7 @@ namespace AutoPauseMod::UI::Main {
 namespace AutoPauseMod::DataManagement {
     class DataManager final {
         private:
-            //NOTE: this is just an observer, main popup destructor handles removing it
-            UI::Main::MainMenuPopup* m_menuPopup = nullptr;
+            geode::WeakRef<UI::Main::MainMenuPopup> m_menuPopup = nullptr;
 
             //these two will always be sorted
             DataPersistence::WaypointList m_loadedLevelWaypoints {};
@@ -27,12 +27,8 @@ namespace AutoPauseMod::DataManagement {
             //true for any unsupported level type
             bool m_bIgnoreState = false;
 
-
-            void RefreshWaypoints(); //will be called after a new level is entered.
             void SetShouldIgnorePracticeMode(bool newState);
             void SetShouldPauseOnNewBest(bool newState);
-            void DiscardPopup();
-
 
             DataManager();
             ~DataManager() = default;
@@ -69,8 +65,8 @@ namespace AutoPauseMod::DataManagement {
 
             void ShowMenuPopup() const;
 
-            void UpdateMenuPopupPointer(UI::Main::MainMenuPopup* newPointer);
-            UI::Main::MainMenuPopup* GetMenuPopup() const {return this->m_menuPopup;}
+            void UpdateMenuPopupPointer(geode::WeakRef<UI::Main::MainMenuPopup> newPointer);
+            UI::Main::MainMenuPopup* GetMenuPopup() const {return this->m_menuPopup.lock();}
 
             DataPersistence::WaypointList GetLevelWaypoints() const {return this->m_loadedLevelWaypoints;}
             DataPersistence::WaypointList GetGlobalWaypoints() const {return this->m_loadedGlobalWaypoints;}

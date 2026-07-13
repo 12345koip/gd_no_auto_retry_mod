@@ -1,6 +1,3 @@
-//created by katie
-//main file... who would've guessed?
-
 #include <Geode/Geode.hpp>
 #include "DataManagement/DataManager.hpp"
 
