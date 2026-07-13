@@ -11,8 +11,7 @@ std::shared_ptr<Waypoint> DataManager::NewWaypoint() {
 
     auto waypoint = std::make_shared<Waypoint>(
         WaypointBehaviourType::FromStartOnly,
-        percentage,
-        this->m_currentLevelID
+        percentage
     );
 
     auto pos = std::ranges::lower_bound(
@@ -41,9 +40,6 @@ void DataManager::ToggleWaypoint(const std::shared_ptr<Waypoint>& waypoint) {
 
     from.erase(it);
     waypoint->SetGlobal(!wasGlobal);
-
-    if (wasGlobal)
-        waypoint->SetLevelID(this->m_currentLevelID);
 
     const auto insertPos = std::ranges::lower_bound(
         to,

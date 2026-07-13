@@ -51,7 +51,6 @@ namespace AutoPauseMod::Waypoints {
 
     class Waypoint final {
         private:
-            int m_levelID;
             float m_activationPercentage;
             WaypointBehaviourType m_behaviourType;
             bool m_bEnabled;
@@ -59,14 +58,11 @@ namespace AutoPauseMod::Waypoints {
 
 
         public:
-            explicit Waypoint(WaypointBehaviourType type, float percentage = 0, int levelID = 0):
-                   m_behaviourType(type), m_activationPercentage(percentage), m_bEnabled(true), m_bIsGlobal(false), m_levelID(levelID) {};
+            explicit Waypoint(WaypointBehaviourType type, float percentage = 0):
+                   m_behaviourType(type), m_activationPercentage(percentage), m_bEnabled(true), m_bIsGlobal(false) {};
 
             void SetBehaviourType(WaypointBehaviourType newType);
             WaypointBehaviourType GetBehaviourType() const {return this->m_behaviourType;}
-
-            void SetLevelID(int newLevelId);
-            int GetLevelID() const {return this->m_levelID;}
 
             void SetTriggerPercentage(float newPercentage);
             float GetTriggerPercentage() const {return this->m_activationPercentage;}

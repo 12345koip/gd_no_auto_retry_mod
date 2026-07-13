@@ -7,8 +7,7 @@ namespace AutoPauseMod::Waypoints {
 }
 
 namespace AutoPauseMod::UI::Main {
-
-    class MainMenuPopup: public geode::Popup {
+    class MainMenuPopup final: public geode::Popup {
         private:
             bool init() override;
             geode::WeakRef<geode::ScrollLayer> m_scroller = nullptr;
@@ -35,5 +34,7 @@ namespace AutoPauseMod::UI::Main {
             void onDeleteAllWaypointsButtonClicked(CCObject*);
             void onDisableAllWaypointsButtonClicked(CCObject*);
             void onInfoButtonClicked(CCObject*);
+
+            void onClose(CCObject*) override;
     };
 }

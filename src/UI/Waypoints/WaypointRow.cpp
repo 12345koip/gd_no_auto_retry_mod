@@ -202,8 +202,12 @@ void WaypointRow::onDeleteButtonClicked(CCObject*) {
         [this](auto, bool didClickYes) -> void {
             if (!didClickYes) return;
             auto scroller = this->m_ownerWaypointScroller.lock();
-
             this->Delete(true);
+
+            if (scroller) {
+                scroller->m_contentLayer->updateLayout();
+                scroller->scrollToTop();
+            }
         }
     );
 }

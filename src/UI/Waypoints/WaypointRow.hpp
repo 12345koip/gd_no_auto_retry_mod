@@ -41,5 +41,6 @@ namespace AutoPauseMod::UI::WaypointUI {
 
             void setEnabled(bool newEnabled);
             void Delete(bool alsoDeleteWaypoint = false);
+            geode::TextInput* GetPercentageInputBox() const {return this->m_pTextInputBox;}
     };
 }
