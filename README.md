@@ -11,6 +11,7 @@ Waypoints have four different modes:
 
 Waypoints can either be **global** or **level-specific**. A global waypoint means it will save and work across any level you play, and a level-specific waypoint will only work on a particular level. Waypoints are level-specific by default.
 
+Only classic levels are supported. This includes playtesting editor levels, but not in the editor menu.
 ## Editing Waypoints
 Waypoints can be created, edited and configured to your liking through the **pause menu**. Click the "AutoPause" button to bring up the UI. The UI will only show waypoints that affect the level you are playing (that is, global waypoints and ones specific to the level). Toggling a waypoint from global to level-specific means it will become specific to the level you are currently playing.
 
