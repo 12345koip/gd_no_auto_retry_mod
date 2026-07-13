@@ -10,7 +10,7 @@ using namespace geode::prelude;
 
 
 bool MainMenuPopup::init() {
-    if (!Popup::init(400.f, 250.f))
+    if (!Popup::init(400.0f, 250.0f))
         return false;
 
     this->setTitle("AutoPause On Death Configuration");
@@ -29,7 +29,7 @@ bool MainMenuPopup::init() {
         this,
         menu_selector(MainMenuPopup::onPracticeToggleClicked),
         0.8f,
-        {190.f, 195.f},
+        {190.0f, 195.0f},
         DataManager->GetIgnorePracticeMode()
     );
     toggleMenu->addChild(toggle_practiceMode);
