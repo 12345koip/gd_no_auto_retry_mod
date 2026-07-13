@@ -1,7 +1,6 @@
 #pragma once
 #include <Geode/Geode.hpp>
 #include <Geode/ui/Popup.hpp>
-#include "../../DataManagement/DataPersistence/Managers.hpp"
 
 namespace AutoPauseMod::Waypoints {
     class Waypoint;

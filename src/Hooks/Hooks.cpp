@@ -116,13 +116,13 @@ class $modify(ModifiedPauseLayer, PauseLayer) {
     }
 
     void onUIOpenButtonClicked(CCObject*) {
-        auto* DataManager = DataManager::GetSingleton();
+        auto* dataManager = DataManager::GetSingleton();
 
-        if (!DataManager->GetMenuPopup()) {
+        if (!dataManager->GetMenuPopup()) {
             auto popup = AutoPauseMod::UI::Main::MainMenuPopup::create();
-            DataManager->UpdateMenuPopupPointer(popup);
+            dataManager->UpdateMenuPopupPointer(popup);
         }
 
-        DataManager->ShowMenuPopup();
+        dataManager->ShowMenuPopup();
     }
 };

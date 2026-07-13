@@ -1,7 +1,7 @@
 #include "WaypointBehaviourSelector.hpp"
 
-using namespace geode::prelude;
 using namespace AutoPauseMod::UI::Selectors;
+using namespace geode::prelude;
 
 void WaypointBehaviourSelector::onLeftButtonClicked(CCObject*) {
     this->m_index = Waypoints::GetPreviousWaypointType(this->m_index);
