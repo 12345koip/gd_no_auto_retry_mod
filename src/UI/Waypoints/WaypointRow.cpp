@@ -153,7 +153,7 @@ bool WaypointRow::init(const std::shared_ptr<Waypoints::Waypoint>& waypoint, con
     return true;
 }
 
-void WaypointRow::SetEnabled(bool newEnabled) {
+void WaypointRow::setEnabled(bool newEnabled) {
     if (this->m_associatedWaypoint.expired()) {
         log::warn("could not set waypoint enabled; waypoint expired");
         return;
