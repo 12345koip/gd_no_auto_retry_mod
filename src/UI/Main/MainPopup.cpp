@@ -273,16 +273,16 @@ void MainMenuPopup::onInfoButtonClicked(CCObject*) {
         "Waypoint Help",
 
         "Waypoints can be <cy>global</c>, or <cy>level-specific</c> (default)."
-        "\n\nWaypoints have four different modes, being "
+        "\nWaypoints have four different modes, being "
         "<cc>From Start Only (STA), From StartPos Only (SP), On Exact Percentage Only (ONP), and From Anywhere (ANY)</c>."
-        "\n\nSee this mod's <cj>About</c> section in the <cy>Geode</c> menu for more information!",
+        "\nSee this mod's <cj>About</c> section in the <cy>Geode</c> menu for more information!",
 
 
         "OK",
         nullptr,
-        350.0f,
+        290.0f,
         false,
-        135.0f,
-        0.7f
+        105.0f,
+        0.75f
     )->show();
 }
