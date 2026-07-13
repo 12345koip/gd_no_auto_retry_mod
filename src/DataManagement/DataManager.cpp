@@ -1,7 +1,5 @@
 #include <cvolton.level-id-api/include/EditorIDs.hpp>
-#include <utility>
 #include "DataManager.hpp"
-#include "../UI/Main/MainPopup.hpp"
 
 using namespace AutoPauseMod::DataManagement;
 using namespace AutoPauseMod::Waypoints;
