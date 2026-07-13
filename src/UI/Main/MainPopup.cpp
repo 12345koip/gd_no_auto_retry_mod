@@ -84,7 +84,7 @@ bool MainMenuPopup::init() {
 
 
     //scroller background
-    auto bg = CCLayerColor::create({0, 0, 0, 90});
+    auto bg = CCLayerColor::create({96, 65, 30, 90});
     bg->setContentSize({280.0f, 125.0f});
     bg->m_bIgnoreAnchorPointForPosition = false;
 
