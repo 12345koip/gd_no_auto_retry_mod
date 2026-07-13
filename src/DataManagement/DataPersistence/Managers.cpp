@@ -13,13 +13,13 @@ template<> struct matjson::Serialize<std::shared_ptr<Waypoint>> {
         GEODE_UNWRAP_INTO(bool enabled, value["enabled"].asBool());
         GEODE_UNWRAP_INTO(float activateAt, value["activateAt"].asDouble());
 
-        return Ok(
-            std::make_shared<Waypoint>(
-                static_cast<WaypointBehaviourType>(behaviourType),
-                activateAt,
-                enabled
-            )
+        auto waypoint = std::make_shared<Waypoint>(
+            static_cast<WaypointBehaviourType>(behaviourType),
+            activateAt
         );
+        waypoint->SetEnabled(enabled);
+
+        return Ok(waypoint);
     }
 
     static matjson::Value toJson(const std::shared_ptr<Waypoint>& waypoint) {

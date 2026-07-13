@@ -286,3 +286,19 @@ void MainMenuPopup::onInfoButtonClicked(CCObject*) {
         0.75f
     )->show();
 }
+
+
+
+//got to do this so input isnt blocked if any of them are focused.
+//i would have tracked the open one with a weak ref and just defocused that
+//but the multiple attempts i gave that failed for reasons i cant comprehend.
+//no ones going to have a stupidly large amount of waypoints for a level.
+//i think i can afford to do this.
+void MainMenuPopup::onClose(CCObject* obj) {
+    if (auto scroller = this->m_scroller.lock()) {
+        for (auto* child: scroller->m_contentLayer->getChildrenExt<WaypointRow>())
+            child->GetPercentageInputBox()->defocus();
+    }
+
+    geode::Popup::onClose(obj);
+}
