@@ -27,7 +27,7 @@ namespace AutoPauseMod::UI::Main {
                 return nullptr;
             }
 
-            void RebuildWaypointList(const DataManagement::DataPersistence::WaypointList& globalWaypoints, const DataManagement::DataPersistence::WaypointList& levelWaypoints);
+            void RebuildWaypointList();
 
             //talk about a lot of listeners...
             void onPracticeToggleClicked(CCObject* sender);
