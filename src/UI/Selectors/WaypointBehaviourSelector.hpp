@@ -13,9 +13,8 @@ namespace AutoPauseMod::UI::Selectors {
             void onLeftButtonClicked(cocos2d::CCObject*);
             void onRightButtonClicked(cocos2d::CCObject*);
 
-            bool init() override;
-
         public:
+            bool init() override;
             static WaypointBehaviourSelector* create() {
                 auto selector = new WaypointBehaviourSelector();
 

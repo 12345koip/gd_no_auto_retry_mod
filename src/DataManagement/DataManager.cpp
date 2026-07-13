@@ -1,4 +1,5 @@
 #include <cvolton.level-id-api/include/EditorIDs.hpp>
+#include <utility>
 #include "DataManager.hpp"
 #include "../UI/Main/MainPopup.hpp"
 
@@ -81,13 +82,9 @@ void DataManager::SetAttemptStartPercentage(float percentage) {
     this->m_attemptStartPercent = percentage;
 }
 
-void DataManager::DiscardPopup() {
-    this->m_menuPopup = nullptr;
-}
-
 void DataManager::ShowMenuPopup() const {
-    if (this->m_menuPopup)
-        this->m_menuPopup->show();
+    if (auto popup = this->m_menuPopup.lock())
+        popup->show();
 }
 
 void DataManager::DeleteAllWaypoints() {
@@ -140,8 +137,6 @@ void DataManager::UpdateForLevelInformation(GJGameLevel* level) {
     //load waypoints.
     this->m_loadedLevelWaypoints = DataPersistence::LoadLevelWaypoints(this->m_currentLevelID, this->m_bIsEditorLevel);
     log::debug("loaded {} waypoints for level {}", this->m_loadedLevelWaypoints.size(), this->m_currentLevelID);
-
-    this->DiscardPopup();
 }
 
 bool DataManager::CheckShouldPauseOnDeath(const float currentPercentage) const {
@@ -153,9 +148,9 @@ bool DataManager::CheckShouldPauseOnDeath(const float currentPercentage) const {
         std::ranges::any_of(this->m_loadedLevelWaypoints, shouldPause);
 }
 
-void DataManager::UpdateMenuPopupPointer(UI::Main::MainMenuPopup* newPointer) {
+void DataManager::UpdateMenuPopupPointer(geode::WeakRef<UI::Main::MainMenuPopup> newPointer) {
     if (!this->m_menuPopup)
-        this->m_menuPopup = newPointer;
+        this->m_menuPopup = std::move(newPointer);
 }
 
 void DataManager::UpdateWaypointListPosition(const std::shared_ptr<Waypoints::Waypoint>& waypoint) {
