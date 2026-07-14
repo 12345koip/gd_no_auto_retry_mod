@@ -162,9 +162,6 @@ bool MainMenuPopup::init() {
 }
 
 
-
-
-
 //listeners.
 
 void MainMenuPopup::onNewBestToggleClicked(CCObject* sender) {
@@ -279,14 +276,14 @@ void MainMenuPopup::onInfoButtonClicked(CCObject*) {
 }
 
 
-// got to do this so input isnt blocked if any of them are focused.
-// i would have tracked the open one with a weak ref and just defocused that
-// but cannot (easily?) listen for a text box being defocused.
-// no ones going to have a stupidly large amount of waypoints for a level.
-// i think i can afford to do this.
+//got to do this so input isnt blocked if any of them are focused.
+//i would have tracked the open one with a weak ref and just defocused that
+//but cannot (easily?) listen for a text box being defocused.
+//no ones going to have a stupidly large amount of waypoints for a level.
+//i think i can afford to do this.
  void MainMenuPopup::onClose(CCObject* obj) {
     for (auto* child: this->m_scroller->m_contentLayer->getChildrenExt<WaypointRow>())
         child->GetPercentageInputBox()->defocus();
 
-     geode::Popup::onClose(obj);
+    geode::Popup::onClose(obj);
  }
