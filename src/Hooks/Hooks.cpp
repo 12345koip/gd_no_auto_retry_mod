@@ -55,9 +55,9 @@ class $modify(ModifiedPlayLayer, PlayLayer) {
 
         PlayLayer::resetLevel();
 
-        auto* DataManager = DataManager::GetSingleton();
+        auto* dataManager = DataManager::GetSingleton();
         float currentPercent = PlayLayer::getCurrentPercent();
-        DataManager->SetAttemptStartPercentage(currentPercent);
+        dataManager->SetAttemptStartPercentage(currentPercent);
         log::debug("new attempt started at {}", currentPercent);
     }
 
@@ -67,24 +67,21 @@ class $modify(ModifiedPlayLayer, PlayLayer) {
 
 
 
-        const auto* DataManager = DataManager::GetSingleton();
-        if (DataManager->GetIgnoreState() || (this->m_isPracticeMode && DataManager->GetIgnorePracticeMode()))
+        const auto* dataManager = DataManager::GetSingleton();
+        if (dataManager->GetIgnoreState() || (this->m_isPracticeMode && dataManager->GetIgnorePracticeMode()))
             return PlayLayer::destroyPlayer(player, object);
 
+
         const int currentBest = this->m_level->getNormalPercent();
-        const int currentPercentage = this->getCurrentPercentInt();
+        const float currentPercentage = this->getCurrentPercent();
 
         PlayLayer::destroyPlayer(player, object);
 
-        const bool isNewBest = DataManager->GetAttemptStartPercentage() <= 0.01f &&
+        const bool isNewBest = dataManager->GetAttemptStartPercentage() <= 0.01f &&
             currentPercentage >= 1.0f && (currentPercentage > currentBest) && !this->m_isPracticeMode;
 
-        /*
-         pause on either:
-         new best AND "pause on new best" setting is enabled,
-         OR any enabled waypoint signals a pause
-        */
-        if (isNewBest && DataManager->GetShouldPauseOnNewBest() || DataManager->CheckShouldPauseOnDeath(currentPercentage))
+        //pause on: new best + new best setting, or any waypoint signals a pause
+        if (isNewBest && dataManager->GetShouldPauseOnNewBest() || dataManager->CheckShouldPauseOnDeath(currentPercentage))
             g_doPauseResetSequence = true;
     }
 };

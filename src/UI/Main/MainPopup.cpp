@@ -17,7 +17,7 @@ bool MainMenuPopup::init() {
     this->setID("MainMenuPopup"_spr);
 
 
-    auto* DataManager = DataManager::GetSingleton();
+    auto* dataManager = DataManager::GetSingleton();
 
     //"ignore practice mode" + "pause on new best" toggles.
     auto toggleMenu = CCMenu::create();
@@ -30,7 +30,7 @@ bool MainMenuPopup::init() {
         menu_selector(MainMenuPopup::onPracticeToggleClicked),
         0.8f,
         {190.0f, 195.0f},
-        DataManager->GetIgnorePracticeMode()
+        dataManager->GetIgnorePracticeMode()
     );
     toggleMenu->addChild(toggle_practiceMode);
 
@@ -50,7 +50,7 @@ bool MainMenuPopup::init() {
         menu_selector(MainMenuPopup::onNewBestToggleClicked),
         0.8f,
         {375.0f, 195.0f},
-        DataManager->GetShouldPauseOnNewBest()
+        dataManager->GetShouldPauseOnNewBest()
     );
 
     toggleMenu->addChild(toggle_pauseOnNewBest);
@@ -184,14 +184,12 @@ void MainMenuPopup::onPracticeToggleClicked(CCObject* sender) {
 
 //not gonna flush and rebuild, see below :3
 void MainMenuPopup::onNewWaypointButtonClicked(CCObject*) {
-    if (auto scroller = this->m_scroller.lock()) {
-        auto waypoint = DataManager::GetSingleton()->NewWaypoint();
-        auto row = WaypointRow::create(waypoint, this->m_scroller, this);
+    auto waypoint = DataManager::GetSingleton()->NewWaypoint();
+    auto row = WaypointRow::create(waypoint, this->m_scroller, this);
 
-        scroller->m_contentLayer->addChild(row);
-        scroller->m_contentLayer->updateLayout();
-        scroller->scrollToTop();
-    }
+    this->m_scroller->m_contentLayer->addChild(row);
+    this->m_scroller->m_contentLayer->updateLayout();
+    this->m_scroller->scrollToTop();
 }
 
 //no nice way to keep an order in the scroller, so when a waypoint's percentage changes,
@@ -199,31 +197,28 @@ void MainMenuPopup::onNewWaypointButtonClicked(CCObject*) {
 //their changes. it's not a horrible trade-off and would be painful to implement
 //so theyll just see it when they next open the menu
 void MainMenuPopup::RebuildWaypointList() {
-    auto scroller = this->m_scroller.lock();
-    if (!scroller) return;
-
     auto* dataManager = DataManager::GetSingleton();
     const auto& levelWaypoints = dataManager->GetLevelWaypoints();
     const auto& globalWaypoints = dataManager->GetGlobalWaypoints();
 
 
-    for (auto* row: scroller->m_contentLayer->getChildrenExt<WaypointRow>())
+    for (auto* row: this->m_scroller->m_contentLayer->getChildrenExt<WaypointRow>())
         row->Delete(false);
 
     for (const auto& waypoint: globalWaypoints) {
         auto row = WaypointRow::create(waypoint, this->m_scroller, this);
-        scroller->m_contentLayer->addChild(row);
-        scroller->m_contentLayer->updateLayout();
+        this->m_scroller->m_contentLayer->addChild(row);
+        this->m_scroller->m_contentLayer->updateLayout();
     }
 
     for (const auto& waypoint: levelWaypoints) {
         auto row = WaypointRow::create(waypoint, this->m_scroller, this);
-        scroller->m_contentLayer->addChild(row);
-        scroller->m_contentLayer->updateLayout();
+        this->m_scroller->m_contentLayer->addChild(row);
+        this->m_scroller->m_contentLayer->updateLayout();
     }
 
-    scroller->m_contentLayer->updateLayout();
-    scroller->scrollToTop();
+    this->m_scroller->m_contentLayer->updateLayout();
+    this->m_scroller->scrollToTop();
 }
 
 void MainMenuPopup::onDisableAllWaypointsButtonClicked(CCObject*) {
@@ -231,16 +226,15 @@ void MainMenuPopup::onDisableAllWaypointsButtonClicked(CCObject*) {
         "Confirm",
         "Are you sure you want to disable <cy>all waypoints</c>?",
         "No", "Yes",
-        [this](auto, bool didClickYes) -> void {
+        [scroller = this->m_scroller](auto, bool didClickYes) -> void {
             if (!didClickYes) return;
-            auto scroller = this->m_scroller.lock();
 
             for (auto* row: scroller->m_contentLayer->getChildrenExt<WaypointRow>())
                 row->setEnabled(false);
 
-            auto* DataManager = DataManager::GetSingleton();
-            DataManager->SaveGlobalWaypointInformation();
-            DataManager->SaveLevelWaypointInformation();
+            auto* dataManager = DataManager::GetSingleton();
+            dataManager->SaveGlobalWaypointInformation();
+            dataManager->SaveLevelWaypointInformation();
         }
     );
 }
@@ -250,11 +244,8 @@ void MainMenuPopup::onDeleteAllWaypointsButtonClicked(CCObject*) {
         "Confirm",
         "Are you sure you want to delete <cy>all waypoints</c>? <cy>This cannot be undone!</c>",
         "No", "Yes",
-        [this](auto, bool didClickYes) -> void {
+        [scroller = this->m_scroller](auto, bool didClickYes) -> void {
             if (!didClickYes) return;
-
-            auto scroller = this->m_scroller.lock();
-            if (!scroller) return;
 
             scroller->m_contentLayer->removeAllChildren();
             scroller->m_contentLayer->updateLayout();
@@ -288,17 +279,14 @@ void MainMenuPopup::onInfoButtonClicked(CCObject*) {
 }
 
 
+// got to do this so input isnt blocked if any of them are focused.
+// i would have tracked the open one with a weak ref and just defocused that
+// but cannot (easily?) listen for a text box being defocused.
+// no ones going to have a stupidly large amount of waypoints for a level.
+// i think i can afford to do this.
+ void MainMenuPopup::onClose(CCObject* obj) {
+    for (auto* child: this->m_scroller->m_contentLayer->getChildrenExt<WaypointRow>())
+        child->GetPercentageInputBox()->defocus();
 
-//got to do this so input isnt blocked if any of them are focused.
-//i would have tracked the open one with a weak ref and just defocused that
-//but the multiple attempts i gave that failed for reasons i cant comprehend.
-//no ones going to have a stupidly large amount of waypoints for a level.
-//i think i can afford to do this.
-void MainMenuPopup::onClose(CCObject* obj) {
-    if (auto scroller = this->m_scroller.lock()) {
-        for (auto* child: scroller->m_contentLayer->getChildrenExt<WaypointRow>())
-            child->GetPercentageInputBox()->defocus();
-    }
-
-    geode::Popup::onClose(obj);
-}
+     geode::Popup::onClose(obj);
+ }
