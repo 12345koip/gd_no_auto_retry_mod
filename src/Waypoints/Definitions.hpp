@@ -10,10 +10,10 @@ namespace AutoPauseMod::DataManagement {
 
 namespace AutoPauseMod::Waypoints {
     enum class WaypointBehaviourType: uint8_t {
-        FromStartPosOnly, //e.g. a waypoint of 53% and a startpos of 40%: would trigger at 93%
+        FromStartPosOnly, //e.g. a waypoint of 53% and a startpos of 40%: die past 93% -> pause
         OnExactPercentage, //if you die exactly on a given percentage, no later, no earlier
-        FromStartOnly, //any percentage from 0. ignores start position
-        FromAnywhere //if you pass a specific percentage in a level regardless of startpos
+        FromStartOnly, //die past given percentage from 0. ignores start position
+        FromAnywhere //any of the above are met
     };
 
     //scary maths...!
