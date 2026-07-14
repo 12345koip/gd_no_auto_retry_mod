@@ -46,6 +46,9 @@ WaypointList DataPersistence::LoadGlobalWaypoints() {
     log::debug("processing load request for global waypoints");
 
     auto waypointList = Mod::get()->getSavedValue<WaypointList>("global", {});
+    for (const auto& waypoint: waypointList)
+        waypoint->SetGlobal(true);
+
     return waypointList;
 }
 
