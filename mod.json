@@ -8,7 +8,7 @@
 	},
 	"id": "kx_.auto-pause-on-death",
 	"name": "Auto Pause On Death",
-	"version": "v1.0.1",
+	"version": "v1.0.2",
 	"developer": "kx_",
 	"description": "",
 	"dependencies": {

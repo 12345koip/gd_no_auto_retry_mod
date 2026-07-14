@@ -29,7 +29,8 @@ static bool ValidatePercentage(const DataManager* dataManager, const Waypoint* w
     switch (waypoint->GetBehaviourType()) {
         case WaypointBehaviourType::FromAnywhere:
             return (startPos <= 0.01f && currentPercentage >= activationPercentage) ||
-                (startPos > 0.01f && currentPercentage - startPos >= activationPercentage);
+                (startPos > 0.01f && currentPercentage - startPos >= activationPercentage) ||
+                    (std::floor(currentPercentage) == std::floor(activationPercentage));
 
         case WaypointBehaviourType::FromStartPosOnly:
             return startPos >= 0.01f && (currentPercentage - startPos >= activationPercentage);
