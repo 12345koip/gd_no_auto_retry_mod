@@ -10,7 +10,7 @@ namespace AutoPauseMod::UI::Main {
     class MainMenuPopup final: public geode::Popup {
         private:
             bool init() override;
-            geode::WeakRef<geode::ScrollLayer> m_scroller = nullptr;
+            geode::ScrollLayer* m_scroller = nullptr;
 
         public:
             static MainMenuPopup* create() {

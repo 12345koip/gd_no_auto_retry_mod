@@ -161,6 +161,7 @@ bool WaypointRow::init(const std::shared_ptr<Waypoints::Waypoint>& waypoint, con
         }
     );
 
+
     return true;
 }
 

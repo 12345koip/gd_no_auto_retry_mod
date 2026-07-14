@@ -24,7 +24,7 @@ void Waypoint::SetBehaviourType(WaypointBehaviourType newType) {
 
 static bool ValidatePercentage(const DataManager* dataManager, const Waypoint* waypoint, const float currentPercentage) {
     const float startPos = dataManager->GetAttemptStartPercentage();
-    const int activationPercentage = std::floor(waypoint->GetTriggerPercentage());
+    const float activationPercentage = waypoint->GetTriggerPercentage();
 
     switch (waypoint->GetBehaviourType()) {
         case WaypointBehaviourType::FromAnywhere:
