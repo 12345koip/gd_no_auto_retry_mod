@@ -46,20 +46,5 @@ static bool ValidatePercentage(const DataManager* dataManager, const Waypoint* w
 }
 
 bool Waypoint::ShouldPause(const DataManager* dataManager, const float currentPercentage) const {
-    bool doPause = this->m_bEnabled && ValidatePercentage(dataManager, this, currentPercentage);
-
-    if (doPause)
-        log::debug(
-            "[Waypoint {}] type = {} current={} start={} activation={} abs={} rel={} result={}",
-            fmt::ptr(this),
-            WaypointTypeToString(GetBehaviourType()),
-            currentPercentage,
-            dataManager->GetAttemptStartPercentage(),
-            this->m_activationPercentage,
-            currentPercentage >= this->m_activationPercentage,
-            currentPercentage - DataManager::GetSingleton()->GetAttemptStartPercentage() >= this->m_activationPercentage,
-            doPause
-        );
-
-    return doPause;
+    return this->m_bEnabled && ValidatePercentage(dataManager, this, currentPercentage);
 }

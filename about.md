@@ -21,4 +21,4 @@ Auto Pause On Death aims to provide fine-tuned control to only pause under speci
 If you want to inspect your deaths when you're far into a level, and can't pause for whatever reason (e.g. if you can't react quick enough to the death, or focusing on that too is too distracting) then this is the mod for you!
 
 ## Bug Reporting
-If you find any bugs using this mod, please open up an Issue on the GitHub repository to report it!
+If you find any bugs using this mod, please open up an Issue on the [GitHub repository](https://github.com/12345koip/gd_no_auto_retry_mod) to report it!

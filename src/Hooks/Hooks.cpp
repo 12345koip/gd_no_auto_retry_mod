@@ -25,6 +25,11 @@ static bool g_wasPaused = false;
 
 
 class $modify(ModifiedPlayLayer, PlayLayer) {
+    static void onModify(auto& self) {
+        if (!self.setHookPriorityAfterPre("PlayLayer::resetLevel", "zilko.death_animations"))
+            log::warn("could not set hook priority for PlayLayer::resetLevel");
+    }
+
     void onEnterTransitionDidFinish() override {
         PlayLayer::onEnterTransitionDidFinish();
         const bool isEditorLevel = this->m_level->m_levelType == GJLevelType::Editor;
@@ -41,7 +46,7 @@ class $modify(ModifiedPlayLayer, PlayLayer) {
             log::debug("resetting level on unpause");
             g_wasPaused = false;
             g_doPauseResetSequence = false;
-            this->resetLevel();
+            PlayLayer::resetLevel();
         }
     }
 
