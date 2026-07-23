@@ -7,22 +7,8 @@
 using namespace AutoPauseMod::DataManagement;
 using namespace geode::prelude;
 
-/*
-mild crashout here.
-literally every useful function for detecting an unpause can't
-be hooked through $modify so i have this horrible workaround of
-not just one but TWO static global variables AND a per-frame poller
-on the PlayLayer.
-
-Not to mention Mod::hook'ing them has weird implications resulting in
-the detour never being called too.
-
-welp :3
-*/
+//ew a global static
 static bool g_doPauseResetSequence = false;
-static bool g_wasPaused = false;
-
-
 
 class $modify(ModifiedPlayLayer, PlayLayer) {
     static void onModify(auto& self) {
@@ -38,21 +24,8 @@ class $modify(ModifiedPlayLayer, PlayLayer) {
         DataManager::GetSingleton()->UpdateForLevelInformation(this->m_level);
     }
 
-
-    void postUpdate(float dt) override {
-        PlayLayer::postUpdate(dt);
-
-        if (g_wasPaused && !this->m_isPaused && g_doPauseResetSequence) {
-            log::debug("resetting level on unpause");
-            g_wasPaused = false;
-            g_doPauseResetSequence = false;
-            PlayLayer::resetLevel();
-        }
-    }
-
     void resetLevel() override {
         if (g_doPauseResetSequence) { //block the reset if a waypoint triggered.
-            g_wasPaused = true;
             log::debug("pausing game for waypoint");
             PlayLayer::pauseGame(false);
             return;
@@ -115,6 +88,15 @@ class $modify(ModifiedPauseLayer, PauseLayer) {
 
         menu->addChild(button);
         menu->updateLayout();
+    }
+
+    void onResume(CCObject* sender) {
+        PauseLayer::onResume(sender);
+
+        if (g_doPauseResetSequence) {
+            g_doPauseResetSequence = false;
+            PlayLayer::get()->resetLevel();
+        }
     }
 
     void onUIOpenButtonClicked(CCObject*) {
