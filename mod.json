@@ -8,12 +8,15 @@
 	},
 	"id": "kx_.auto-pause-on-death",
 	"name": "Auto Pause On Death",
-	"version": "v1.0.4",
+	"version": "v1.0.5",
 	"developer": "kx_",
-	"description": "",
+	"description": "Provides control over automatic pausing on death",
 	"dependencies": {
 		"geode.node-ids": ">=v1.23.3",
 		"cvolton.level-id-api": ">=2.0.0"
 	},
-	"tags": ["gameplay"]
+	"tags": ["gameplay"],
+	"links": {
+		"source": "https://github.com/12345koip/gd_no_auto_retry_mod"
+	}
 }
