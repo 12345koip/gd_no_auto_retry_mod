@@ -101,6 +101,11 @@ class $modify(ModifiedPauseLayer, PauseLayer) {
         }
     }
 
+    void onRestart(CCObject* sender) {
+        g_doPauseResetSequence = false; //must unblock this so the reset goes through.
+        PauseLayer::onRestart(sender);
+    }
+
     void onUIOpenButtonClicked(CCObject*) {
         auto* dataManager = DataManager::GetSingleton();
 
