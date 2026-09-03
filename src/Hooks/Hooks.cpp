@@ -18,6 +18,8 @@ class $modify(ModifiedPlayLayer, PlayLayer) {
 
     void onEnterTransitionDidFinish() override {
         PlayLayer::onEnterTransitionDidFinish();
+        g_doPauseResetSequence = false;
+
         const bool isEditorLevel = this->m_level->m_levelType == GJLevelType::Editor;
 
         log::debug("level enter: {} isEditorLevel: {}", this->m_level->m_levelID, isEditorLevel);
