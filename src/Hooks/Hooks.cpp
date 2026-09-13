@@ -16,6 +16,12 @@ class $modify(ModifiedPlayLayer, PlayLayer) {
             log::warn("could not set hook priority for PlayLayer::resetLevel");
     }
 
+    void togglePracticeMode(bool practiceMode) {
+        PlayLayer::togglePracticeMode(practiceMode);
+        g_doPauseResetSequence = false;
+        PlayLayer::resetLevel();
+    }
+
     void onEnterTransitionDidFinish() override {
         PlayLayer::onEnterTransitionDidFinish();
         g_doPauseResetSequence = false;

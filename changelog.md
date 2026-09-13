@@ -1,3 +1,6 @@
+# v1.0.6
+- Fixed a bug causing the reset to hang when entering practice mode from an auto pause
+
 # v1.0.5
 Bug fixes:
 - Fixed an issue where if a waypoint caused a pause and the level was exited from that pause, the next attempt on any level would pause no matter what
