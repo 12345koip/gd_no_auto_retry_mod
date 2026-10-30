@@ -16,12 +16,6 @@ class $modify(ModifiedPlayLayer, PlayLayer) {
             log::warn("could not set hook priority for PlayLayer::resetLevel");
     }
 
-    void togglePracticeMode(bool practiceMode) {
-        PlayLayer::togglePracticeMode(practiceMode);
-        g_doPauseResetSequence = false;
-        PlayLayer::resetLevel();
-    }
-
     void onEnterTransitionDidFinish() override {
         PlayLayer::onEnterTransitionDidFinish();
         g_doPauseResetSequence = false;
@@ -76,13 +70,24 @@ class $modify(ModifiedPauseLayer, PauseLayer) {
     void customSetup() override {
         PauseLayer::customSetup();
 
-        if (DataManager::GetSingleton()->GetIgnoreState()) return;
+        if (DataManager::GetSingleton()->GetIgnoreState()) {
+            log::debug("Ignore state active.");
+            return;
+        };
 
-        CCNode* menu = this->getChildByID("bottom-button-menu");
-        if (!menu) return;
+        CCNode* menu = this->getChildByID("main-layer")->getChildByID("right-button-menu");
+        if (!menu) {
+            log::debug("Button menu not found. Skipping");
+            return;
+        }
+
+
+
+        auto icon = CCSprite::create("uiOpenButton_1.png"_spr);
+        auto sprite = CircleButtonSprite::create(icon, CircleBaseColor::Green, CircleBaseSize::Medium);
 
         auto button = CCMenuItemSpriteExtra::create(
-            ButtonSprite::create("AutoPause"),
+            sprite,
             this,
             menu_selector(ModifiedPauseLayer::onUIOpenButtonClicked)
         );
@@ -91,14 +96,16 @@ class $modify(ModifiedPauseLayer, PauseLayer) {
             AxisLayoutOptions::create()->setAutoScale(false)
         );
 
-        button->m_baseScale = 0.7f;
-        button->setScale(0.7f);
+        button->m_baseScale = 0.6f;
+        button->setScale(0.6f);
+        button->setID("ui-open-button"_spr);
 
         menu->addChild(button);
         menu->updateLayout();
     }
 
     void onResume(CCObject* sender) {
+        log::debug("PauseLayer::onResume called");
         PauseLayer::onResume(sender);
 
         if (g_doPauseResetSequence) {
@@ -108,6 +115,7 @@ class $modify(ModifiedPauseLayer, PauseLayer) {
     }
 
     void onRestart(CCObject* sender) {
+        log::debug("PauseLayer::onRestart called");
         g_doPauseResetSequence = false; //must unblock this so the reset goes through.
         PauseLayer::onRestart(sender);
     }

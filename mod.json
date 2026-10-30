@@ -1,7 +1,7 @@
 {
-	"geode": "5.8.1",
+	"geode": "5.11.2",
 	"gd": {
-		"win": "2.2081",
+		"win": "2.2091",
 		"android": "2.2081",
 		"ios": "2.2081",
 		"mac": "2.2081"
@@ -16,6 +16,9 @@
 		"cvolton.level-id-api": ">=2.0.0"
 	},
 	"tags": ["gameplay"],
+    "resources": {
+        "sprites": ["resources/sprites/uiOpenButton_1.png"]
+    },
 	"links": {
 		"source": "https://github.com/12345koip/gd_no_auto_retry_mod"
 	}

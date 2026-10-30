@@ -30,6 +30,7 @@ namespace AutoPauseMod::UI::Main {
             //talk about a lot of listeners...
             void onPracticeToggleClicked(CCObject* sender);
             void onNewBestToggleClicked(CCObject* sender);
+            void onNewSessionBestToggleClicked(CCObject* sender);
             void onNewWaypointButtonClicked(CCObject*);
             void onDeleteAllWaypointsButtonClicked(CCObject*);
             void onDisableAllWaypointsButtonClicked(CCObject*);

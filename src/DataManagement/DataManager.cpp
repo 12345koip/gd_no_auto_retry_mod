@@ -94,6 +94,11 @@ void DataManager::SetShouldIgnorePracticeMode(bool newState) {
     Mod::get()->setSavedValue<bool>("ignorePracticeMode", newState);
 }
 
+void DataManager::SetShouldPauseOnNewSessionBest(bool newState) {
+    this->m_bPauseOnNewSessionBest = newState;
+    Mod::get()->setSavedValue<bool>("pauseOnNewSessionBest", newState);
+}
+
 void DataManager::SaveGlobalWaypointInformation() const {
     DataPersistence::SerialiseAndSaveWaypoints(this->m_loadedGlobalWaypoints);
     log::debug("saved {} global waypoints", this->m_loadedGlobalWaypoints.size());
@@ -171,4 +176,5 @@ DataManager::DataManager() {
     this->m_loadedGlobalWaypoints = DataPersistence::LoadGlobalWaypoints();
     this->m_bPauseOnNewBest = Mod::get()->getSavedValue<bool>("pauseOnNewBest", true);
     this->m_bIgnorePracticeMode = Mod::get()->getSavedValue<bool>("ignorePracticeMode", true);
+    this->m_bPauseOnNewSessionBest = Mod::get()->getSavedValue<bool>("pauseOnNewSessionBest", true);
 }

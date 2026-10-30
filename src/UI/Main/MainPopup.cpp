@@ -13,7 +13,9 @@ bool MainMenuPopup::init() {
     if (!Popup::init(400.0f, 250.0f))
         return false;
 
-    this->setTitle("AutoPause On Death Configuration");
+    this->setTitle("AutoPause On Death Configuration", "bigFont.fnt");
+    this->m_title->setScale(0.55);
+    this->m_title->setPosition({200.0f, 238.0f});
     this->setID("MainMenuPopup"_spr);
 
 
@@ -28,8 +30,8 @@ bool MainMenuPopup::init() {
     auto toggle_practiceMode = Utils::MakeToggle(
         this,
         menu_selector(MainMenuPopup::onPracticeToggleClicked),
-        0.8f,
-        {190.0f, 195.0f},
+        0.65f,
+        {175.0f, 214.0f},
         dataManager->GetIgnorePracticeMode()
     );
     toggleMenu->addChild(toggle_practiceMode);
@@ -39,8 +41,8 @@ bool MainMenuPopup::init() {
         "Ignore practice mode",
         "goldFont.fnt",
         {0.0f, 0.5f},
-        {10.0f, 195.5f},
-        0.6f
+        {10.0f, 215.5f},
+        0.55f
     );
     this->m_mainLayer->addChild(label_practiceMode);
 
@@ -48,8 +50,8 @@ bool MainMenuPopup::init() {
     auto toggle_pauseOnNewBest = Utils::MakeToggle(
         this,
         menu_selector(MainMenuPopup::onNewBestToggleClicked),
-        0.8f,
-        {375.0f, 195.0f},
+        0.65f,
+        {348.0f, 214.0f},
         dataManager->GetShouldPauseOnNewBest()
     );
 
@@ -59,12 +61,30 @@ bool MainMenuPopup::init() {
         "Pause on new best",
         "goldFont.fnt",
         {0.0f, 0.5f},
-        {215.0f, 195.0f},
+        {195.0f, 215.0f},
         0.6f
     );
     this->m_mainLayer->addChild(label_pauseOnNewBest);
 
 
+    auto label_pauseOnNewSessionBest = Utils::MakeLabel(
+        "Pause on new session best",
+        "goldFont.fnt",
+        {0.0f, 0.5f},
+        {10.0f, 190.0f},
+        0.6f
+    );
+    this->m_mainLayer->addChild(label_pauseOnNewSessionBest);
+
+    auto toggle_pauseOnNewSessionBest = Utils::MakeToggle(
+        this,
+        menu_selector(MainMenuPopup::onNewSessionBestToggleClicked),
+        0.65f,
+        {228.0f, 188.0f},
+        dataManager->GetShouldPauseOnNewSessionBest()
+    );
+
+    toggleMenu->addChild(toggle_pauseOnNewSessionBest);
 
 
 
@@ -80,6 +100,7 @@ bool MainMenuPopup::init() {
         ScrollLayer::createDefaultListLayout(6.0f)
     );
 
+    scroller->m_cutContent = false; //temp fix. TODO: add perm fix when (if?) geode scroller gets fixed, else remove clipping
     this->m_mainLayer->addChildAtPosition(scroller, Anchor::Center, {0.0f, -35.0f});
 
 
@@ -97,8 +118,8 @@ bool MainMenuPopup::init() {
         "Waypoints",
         "bigFont.fnt",
         {0.5f, 0.5f},
-        {200.0f, 167.0f},
-        0.6f
+        {200.0f, 163.0f},
+        0.5f
     );
 
     this->m_mainLayer->addChild(label_waypoints);
@@ -178,6 +199,12 @@ void MainMenuPopup::onPracticeToggleClicked(CCObject* sender) {
     DataManager::GetSingleton()->SetShouldIgnorePracticeMode(!disabled);
 }
 
+void MainMenuPopup::onNewSessionBestToggleClicked(CCObject* sender) {
+    auto toggle = static_cast<CCMenuItemToggler*>(sender);
+
+    bool disabled = toggle->isToggled();
+    DataManager::GetSingleton()->SetShouldPauseOnNewSessionBest(!disabled);
+}
 
 //not gonna flush and rebuild, see below :3
 void MainMenuPopup::onNewWaypointButtonClicked(CCObject*) {

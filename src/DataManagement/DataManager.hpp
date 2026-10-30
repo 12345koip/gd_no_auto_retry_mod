@@ -23,12 +23,14 @@ namespace AutoPauseMod::DataManagement {
 
             bool m_bPauseOnNewBest = true;
             bool m_bIgnorePracticeMode = true;
+            bool m_bPauseOnNewSessionBest = true;
 
             //true for any unsupported level type
             bool m_bIgnoreState = false;
 
             void SetShouldIgnorePracticeMode(bool newState);
             void SetShouldPauseOnNewBest(bool newState);
+            void SetShouldPauseOnNewSessionBest(bool newState);
 
             DataManager();
             ~DataManager() = default;
@@ -52,6 +54,7 @@ namespace AutoPauseMod::DataManagement {
 
             bool GetShouldPauseOnNewBest() const {return this->m_bPauseOnNewBest;}
             bool GetIgnorePracticeMode() const {return this->m_bIgnorePracticeMode;}
+            bool GetShouldPauseOnNewSessionBest() const {return this->m_bPauseOnNewSessionBest;}
 
             bool CheckShouldPauseOnDeath(const float currentPercentage) const;
             std::shared_ptr<Waypoints::Waypoint> NewWaypoint();
