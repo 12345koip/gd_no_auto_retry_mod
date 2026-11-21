@@ -23,7 +23,7 @@ namespace AutoPauseMod::DataManagement {
 
             bool m_bPauseOnNewBest = true;
             bool m_bIgnorePracticeMode = true;
-            bool m_bPauseOnNewSessionBest = true;
+            bool m_bPauseOnNewSessionBest = false;
 
             //true for any unsupported level type
             bool m_bIgnoreState = false;

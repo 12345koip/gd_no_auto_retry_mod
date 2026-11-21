@@ -1,4 +1,4 @@
-#include <cvolton.level-id-api/include/EditorIDs.hpp>
+#include <cvolton.level-id-api/EditorIDs.hpp>
 #include "DataManager.hpp"
 
 using namespace AutoPauseMod::DataManagement;

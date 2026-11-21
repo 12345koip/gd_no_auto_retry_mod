@@ -53,15 +53,17 @@ class $modify(ModifiedPlayLayer, PlayLayer) {
 
 
         const int currentBest = this->m_level->getNormalPercent();
+        const int currentSessionBest = this->m_level->getSessionBest();
         const float currentPercentage = this->getCurrentPercent();
 
         PlayLayer::destroyPlayer(player, object);
 
-        const bool isNewBest = dataManager->GetAttemptStartPercentage() <= 0.01f &&
-            currentPercentage >= 1.0f && (currentPercentage > currentBest) && !this->m_isPracticeMode;
+        const bool isFromStart = dataManager->GetAttemptStartPercentage() <= 0.01f;
+        const bool isNewBest = isFromStart && currentPercentage >= 1.0f && (currentPercentage > currentBest) && !this->m_isPracticeMode;
+        const bool isNewSessionBest = isFromStart && currentBest >= 1.0f && (currentPercentage > currentSessionBest) && !this->m_isPracticeMode;
 
-        //pause on: new best + new best setting, or any waypoint signals a pause
-        if (isNewBest && dataManager->GetShouldPauseOnNewBest() || dataManager->CheckShouldPauseOnDeath(currentPercentage))
+        //pause on: new best + new best setting, new session best + setting, or any waypoint signals a pause
+        if ((isNewBest && dataManager->GetShouldPauseOnNewBest()) || (isNewSessionBest && dataManager->GetShouldPauseOnNewSessionBest()) || dataManager->CheckShouldPauseOnDeath(currentPercentage))
             g_doPauseResetSequence = true;
     }
 };

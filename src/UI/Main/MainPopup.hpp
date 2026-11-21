@@ -35,7 +35,5 @@ namespace AutoPauseMod::UI::Main {
             void onDeleteAllWaypointsButtonClicked(CCObject*);
             void onDisableAllWaypointsButtonClicked(CCObject*);
             void onInfoButtonClicked(CCObject*);
-
-            void onClose(CCObject*) override;
     };
 }

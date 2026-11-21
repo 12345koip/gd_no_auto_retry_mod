@@ -13,7 +13,7 @@ bool MainMenuPopup::init() {
     if (!Popup::init(400.0f, 250.0f))
         return false;
 
-    this->setTitle("AutoPause On Death Configuration", "bigFont.fnt");
+    this->setTitle("AutoPause on Death", "bigFont.fnt");
     this->m_title->setScale(0.55);
     this->m_title->setPosition({200.0f, 238.0f});
     this->setID("MainMenuPopup"_spr);
@@ -100,7 +100,6 @@ bool MainMenuPopup::init() {
         ScrollLayer::createDefaultListLayout(6.0f)
     );
 
-    scroller->m_cutContent = false; //temp fix. TODO: add perm fix when (if?) geode scroller gets fixed, else remove clipping
     this->m_mainLayer->addChildAtPosition(scroller, Anchor::Center, {0.0f, -35.0f});
 
 
@@ -301,16 +300,3 @@ void MainMenuPopup::onInfoButtonClicked(CCObject*) {
         0.75f
     )->show();
 }
-
-
-//got to do this so input isnt blocked if any of them are focused.
-//i would have tracked the open one with a weak ref and just defocused that
-//but cannot (easily?) listen for a text box being defocused.
-//no ones going to have a stupidly large amount of waypoints for a level.
-//i think i can afford to do this.
- void MainMenuPopup::onClose(CCObject* obj) {
-    for (auto* child: this->m_scroller->m_contentLayer->getChildrenExt<WaypointRow>())
-        child->GetPercentageInputBox()->defocus();
-
-    geode::Popup::onClose(obj);
- }
