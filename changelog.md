@@ -1,3 +1,8 @@
+# v1.0.7
+- Moved UI open button in the pause menu. It is now an icon on the right-hand side.
+- Minor bug fixes
+- Updated to Geode v6.0.0-beta.1
+
 # v1.0.6
 - Fixed a bug causing the reset to hang when entering practice mode from an auto pause
 
