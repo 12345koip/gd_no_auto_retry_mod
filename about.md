@@ -13,7 +13,7 @@ Waypoints can either be **global** or **level-specific**. A global waypoint mean
 
 Only classic levels are supported. This includes playtesting editor levels, but not in the editor menu.
 ## Editing Waypoints
-Waypoints can be created, edited and configured to your liking through the **pause menu**. Click the "AutoPause" button to bring up the UI. The UI will only show waypoints that affect the level you are playing (that is, global waypoints and ones specific to the level). Toggling a waypoint from global to level-specific means it will become specific to the level you are currently playing.
+Waypoints can be created, edited and configured to your liking through the **pause menu**. Click the button matching this mod's icon to bring up the UI. The UI will only show waypoints that affect the level you are playing (that is, global waypoints and ones specific to the level). Toggling a waypoint from global to level-specific means it will become specific to the level you are currently playing.
 
 ## Why not just use the Auto Retry setting?
 Auto Pause On Death aims to provide fine-tuned control to only pause under specific circumstances instead of on every attempt. Bringing up the pause menu instead of the auto retry menu also allows you to use other third-party tools (**none are included with this mod**) to inspect your death, as many of these tools do not work with the auto retry menu.

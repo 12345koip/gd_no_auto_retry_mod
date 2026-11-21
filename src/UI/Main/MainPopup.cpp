@@ -15,7 +15,7 @@ bool MainMenuPopup::init() {
 
     this->setTitle("AutoPause on Death", "bigFont.fnt");
     this->m_title->setScale(0.55);
-    this->m_title->setPosition({200.0f, 238.0f});
+    this->m_title->setPosition({200.0f, 236.0f});
     this->setID("MainMenuPopup"_spr);
 
 
